@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Medipat</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+    <href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="add_medicine_patient.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+
+  </head>
+  <body>
+
+    <nav>
+         <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+         </div>
+         <div class="logo">
+            Medipat
+         </div>
+         <div class="nav-items">
+            <li><a href="hospital_home.html">Home</a></li>
+            <li><a href="patient_details_doctor.html">Patient details</a></li>
+            <li><a href="add_lab_tests_patient_doctor.html">Add tests</a></li>
+         </div>
+         <div class="search-icon">
+            <span class="fas fa-search"></span>
+         </div>
+         <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+         </div>
+      </nav>
+
+      <div class="content_form" id ="content_form">
+          <div class="maindivclass" id="fetching_form">
+              <div class="maincontainer">
+                <h1>Add medicine</h1>
+                <div class="formcontainer">
+                  <center><span id="loading_bar_fetcher"></span></center>
+                  <span id="error_fetcher" style="color:red;font-size: 25px;font-weight: bold;"></span>
+
+                  <center><img src="img/loader.svg" alt="Error" id="loader_fetcher" /></center>
+                  <span id="no_internet_span" style="color: red;display: none;">Please Check your internet connectivity...</span>
+                  <button id="refreshbtn" >Refresh this page</button></center>
+
+                </div>
+
+              </div>
+            </div>
+
+            <div class="maindivclass" id="main_form" style="display: none;">
+              
+              <div>
+                  <label id="date_label">Date:</label>
+                  <label id="time_label">Time:</label>
+              </div>
+
+
+                  <div class="maincontainer" id="phone_number_container" >
+                    <h1>Add medicine</h1>
+                  </div>
+                    <div class="formcontainer">
+                          <div class="container">
+                            <h1 id="aadhar_h1" style="color: blue;"></h1>
+                              <label ><strong>Medicine Name:</strong></label><br/><br/>
+                                <span><b>Filter medicine</b></span>
+                                  <input type="text" placeholder="Enter medicine name hint" id="hospital_filter"  onkeyup="Filter()" required>
+                              
+                                <select id="Medicines">
+                                  <option value="" selected>Select medicine</option>
+                                </select>
+                              </label>
+                              <button type="button" id="add_medicine_select_btn">Select</button>
+                              <br/>
+
+                              <center><div id="div_noofdays" style="display: none;">
+                                <label>No of Days:</label>
+                                <input type="number" id="noofdays_text"  minlength="1" style="width: 10%;text-align: center;" />
+                              </div>
+                            </center>
+
+                      <span id="error_msg" style="color:red;"></span>
+
+                      <p id="loading_bar_signin"></p>
+                      <center><img src="img/loader.svg" alt="Error" id="loader_signin" style="display: none" /></center>
+
+                          </div>
+                          <button type="button" id="savemedicinebtn">Add medicine</button>
+
+
+                          <div id="medicine_table" style="display: none;">
+                            <table id="table_medicines" style="width: 100%;border: 3px solid orange;"
+                            border="3px solid " >
+                              <tr> <th width="65%" style="color: #050aa8;text-align: center;font-size: 23px;">Medicine Name</th> <th style="color: #050aa8;text-align: center;font-size: 23px;" width="10%">No of Days</th> <th style="color: #050aa8;text-align: center;font-size: 23px;" width="12%">Delete</th></tr>
+                            </table>
+                            
+                          </div>
+
+                          <span id="error_msg_submit" style="color:red;"></span>
+
+                          <center><p id="loading_bar_submit" style="font-size: 23px;font-family: sans-serif;color: #04c939;"></p></center>
+                          <center><img src="img/loader.svg" alt="Error" id="loader_submit" style="display: none" /></center>
+
+
+                          <div class="container" style="background-color:#f1f1f1">
+                                <button type="button" class="signupbtn_cl" id="submitbtn">Save</button>
+                          </div>
+
+                          <div id="all_medicine_table" style="display: none;margin-top: 7px;margin-bottom: 5px">
+                              <center><p style="font-size: 25px;font-family: sans-serif;color: #04c939;">All Medicines for Patients</p></center>
+                              <table id="table_medicines_all" style="width: 100%;border: 3px solid #07b536;"
+                              border="3px solid " >
+                                <tr> <th width="75%" style="color: #f24018;text-align: center;font-size: 23px;">Medicine Name</th> <th style="color: #f24018;text-align: center;font-size: 23px;" width="15%">No of Days</th></tr>
+                              </table>
+                          </div>
+
+                    </div> 
+                  </div>
+            </div>
+
+      </div>
+
+
+    <script>
+
+         const menuBtn = document.querySelector(".menu-icon span");
+         const searchBtn = document.querySelector(".search-icon");
+         const cancelBtn = document.querySelector(".cancel-icon");
+         const items = document.querySelector(".nav-items");
+         const form = document.querySelector("form");
+         menuBtn.onclick = ()=>{
+           items.classList.add("active");
+           menuBtn.classList.add("hide");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+         cancelBtn.onclick = ()=>{
+           items.classList.remove("active");
+           menuBtn.classList.remove("hide");
+           searchBtn.classList.remove("hide");
+           cancelBtn.classList.remove("show");
+           form.classList.remove("active");
+           cancelBtn.style.color = "#ff3d00";
+         }
+         searchBtn.onclick = ()=>{
+           form.classList.add("active");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+    </script>
+
+    <script type="text/javascript">
+          function Filter(){
+            var keyword=document.getElementById("hospital_filter").value.toLowerCase();
+            var sel=document.getElementById("Hospitals");
+            for(var i=0;i<sel.length;i++){
+              var txt=sel.options[i].text.toLowerCase();
+              if(!txt.match(keyword)){
+                $(sel.options[i]).attr('disabled','disabled').hide();
+              }else{
+                $(sel.options[i]).removeAttr('disabled').show();
+              }
+            }
+          }
+      </script>
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+      import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+
+              
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+     firebase.analytics();
+
+     // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db=getDatabase();
+
+    var fetcher_form=document.getElementById("fetching_form");
+    var main_form=document.getElementById("main_form")
+    var hospital_s='',aadhar_s;
+
+    function update_date_time(){
+          var date=new Date();
+          var today=date.getDate()+"-"+(date.getMonth()+1)+"-"+date.getFullYear();
+          document.getElementById("date_label").innerHTML="Date: "+today;
+          var time=date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+          document.getElementById("time_label").innerHTML="Time: "+time;
+    }
+    setInterval(update_date_time,1000);
+
+    window.onload=function(){
+      update_date_time();
+      hospital_s=window.localStorage.getItem("hospital_name");
+      aadhar_s=window.localStorage.getItem("patient_aadhar");
+      document.getElementById("aadhar_h1").innerHTML=aadhar_s;
+      
+        if(navigator.onLine){
+          var hos_sel=document.getElementById("Medicines");
+
+          var error_msg_fet=document.getElementById("error_fetcher");
+          var loading_bar_fet=document.getElementById("loading_bar_fetcher");
+          var loader_fet=document.getElementById("loader_fetcher");
+          var refreshbtn=document.getElementById("refreshbtn");
+          main_form.style.display='none';
+          loader_fet.style.display='block';
+
+          error_msg_fet.textContent="";
+          loading_bar_fet.textContent="Please wait while we fetching medicine details...";
+          const dbref=firebase.database().ref();
+              dbref.child("Hospitals").child(hospital_s).child("Medicine").once("value",function(snapshot){
+                if(snapshot.exists()){
+                      snapshot.forEach(function(childsnapshot){
+                        var value=childsnapshot.key;
+                        value=value.replace("{}",".");
+                        value=value.replace("[]","#");
+                        value=value.replace("<>","$");
+                        var opt=document.createElement('option');
+                        opt.value=value;
+                        opt.innerHTML=value;
+                        hos_sel.appendChild(opt); 
+                        loader_fet.style.display='none';
+                        main_form.style.display='block';
+                        fetching_form.style.display='none';
+                      });
+
+                }else{
+                  error_msg_fet.textContent="There is no medicine has found in your hospital. Please add medicine in your hospital. (In add medicine page.)";
+                  loading_bar_fet.textContent="";
+                  loader_fet.style.display='none';
+                }
+                      
+              }).catch((error)=>{
+                  error_msg_fet.textContent=error;
+                  loading_bar_fet.textContent="";
+                  loader_fet.style.display='none';
+              });
+          sortSelect(hos_sel);
+        }else{
+            document.getElementById("no_internet_span").style.display="block";
+            alert("Oops! You're offline. Please check your network connection...")          
+        } 
+    };
+
+    function sortSelect(selElem) {
+          var tmpAry = new Array();
+          for (var i=0;i<selElem.options.length;i++) {
+              tmpAry[i] = new Array();
+              tmpAry[i][0] = selElem.options[i].text;
+              tmpAry[i][1] = selElem.options[i].value;
+          }
+          tmpAry.sort();
+          while (selElem.options.length > 0) {
+              selElem.options[0] = null;
+          }
+          for (var i=0;i<tmpAry.length;i++) {
+              var op = new Option(tmpAry[i][0], tmpAry[i][1]);
+              selElem.options[i] = op;
+          }
+          return;
+      }
+    var medicine_s='';
+    function SelectMedicine(){
+      document.getElementById("error_msg").textContent="";
+      medicine_s=document.getElementById("Medicines").value;
+      if(medicine_s==''){
+        document.getElementById("error_msg").textContent="Please select medicine...";
+      }else{
+        document.getElementById('div_noofdays').style.display='block';
+        document.getElementById('noofdays_text').focus();
+      }
+    }
+
+    document.getElementById('add_medicine_select_btn').addEventListener('click',SelectMedicine);
+
+    function AddMedicine(){
+
+      document.getElementById("loading_bar_submit").textContent="";
+      document.getElementById("error_msg").textContent="";
+      var noofdays_s=document.getElementById('noofdays_text').value;
+      var medicine_star=document.getElementById("Medicines").value;
+
+      var table = document.getElementsByTagName("table")[0]; //first table
+      var rows = table.rows; 
+      var found=0;
+    
+      for (var i = 0; i < rows.length; i+=1) {
+        if(i!=0){
+          var emailTr = rows[i];
+          var emailTd = emailTr.cells[0]; //target third column/cell
+          var email = emailTd.innerHTML; //get the value
+          var emailTr2 = rows[i];
+          var emailTd2 = emailTr2.cells[1]; //target third column/cell
+          var email2 = emailTd2.innerHTML;
+          if(email==medicine_star){
+            found=1;
+          }
+        }
+      }
+      if(found==0){
+        if(medicine_star==''){
+          document.getElementById("error_msg").textContent="Please select medicine...";
+        }
+        else if(noofdays_s<1){
+          document.getElementById("error_msg").textContent="No of days should be atleast one";
+        }else{
+          document.getElementById('error_msg_submit').textContent="";
+
+          document.getElementById('medicine_table').style.display='block';
+          document.getElementById('all_medicine_table').style.display='block';
+          var row=0;
+          row=document.getElementById('table_medicines').rows.length;
+          var x=document.getElementById('table_medicines').insertRow(row);
+          var c1=x.insertCell(0);
+          var c2=x.insertCell(1);
+          var c3=x.insertCell(2);
+          c1.innerHTML=medicine_star;
+          c1.style.fontSize='25px';
+          c1.style.fontFamily='serif';
+          c2.innerHTML=noofdays_s;
+          c2.style.fontSize='30px';
+          c2.style.textAlign='center';
+          c2.style.fontFamily='serif';
+
+          var button = document.createElement("button");
+          button.innerHTML = "Delete";
+          button.style.color='#ffffff';
+          button.style.fontSize='20px';
+          button.style.backgroundColor='#f58e07';
+          button.style.width='91%';
+          button.style.marginLeft='5px';
+          button.style.marginRight='5px';
+          button.addEventListener('click',function(){
+            var tableRow = $("td")
+              .filter(function(index, el) {
+                return (
+                  $(el) // <-- the <td> element
+                    .text() == medicine_star
+                );
+              })
+              .closest("tr");
+            tableRow.remove();
+          });
+          
+          c3.appendChild(button);
+
+
+          var row1=0;
+          row1=document.getElementById('table_medicines_all').rows.length;
+          var x=document.getElementById('table_medicines_all').insertRow(row1);
+          var c1=x.insertCell(0);
+          var c2=x.insertCell(1);
+          c1.innerHTML=medicine_star;
+          c1.style.fontSize='25px';
+          c1.style.fontFamily='serif';
+          c2.innerHTML=noofdays_s;
+          c2.style.fontSize='30px';
+          c2.style.textAlign='center';
+          c2.style.fontFamily='serif';
+
+      //     var i=row.parentNode.parentNode.rowIndex;
+      // document.getElementById('POITable').deleteRow(i);
+        }
+      }else{
+        document.getElementById("error_msg").textContent="Medicine already added...";
+      }
+      
+      
+    }
+    document.getElementById('savemedicinebtn').addEventListener('click',AddMedicine);
+
+    function Submit(){
+      var table = document.getElementsByTagName("table")[0]; //first table
+      var rows = table.rows; 
+      var len=rows.length;
+      var obj_m={};
+      var obj_d={}
+      for (var i = 0; i < rows.length; i+=1) {
+        if(i!=0){
+          var emailTr = rows[i];
+          var emailTd = emailTr.cells[0]; //target third column/cell
+          var email = emailTd.innerHTML; //get the value
+          var emailTr2 = rows[i];
+          var emailTd2 = emailTr2.cells[1]; //target third column/cell
+          var email2 = emailTd2.innerHTML;
+          email=email.replace('.','{}');
+          email=email.replace('#','[]'); 
+          email=email.replace('$','<>');
+          obj_m[email]=email2;
+        }
+      }
+    
+      var loading_bar=document.getElementById('loading_bar_submit');
+      var errormsg=document.getElementById('error_msg_submit');
+      var loader=document.getElementById('loader_submit');
+
+      var date=new Date();
+      var today=date.getDate()+":"+(date.getMonth()+1)+":"+date.getFullYear();
+      var time=date.getHours()+":"+date.getMinutes();
+      var found=0;
+      var medicine_s='';
+      if(len>1){
+        loading_bar.textContent="Please wait while we save medicine details..."
+        errormsg.textContent="";
+        loader.style.display='block';
+        for (var key in obj_m) {
+          if (obj_m.hasOwnProperty(key)) {
+              var hosRef=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+aadhar_s+"/Medicine/"+today+"/"+time+"/"+key);
+              medicine_s=key;
+              hosRef.update({
+                          No_of_Days:obj_m[key]
+                },(error)=>{
+                    if(error){
+                        errormsg.textContent=error;
+                        loading_bar.textContent="";
+                        loader.style.display='none';
+                    }else{
+                      addMedicinetoPatient();
+                    }
+                }).catch(function(error) {
+                      loader.style.display="none";
+                      errormsg.textContent=error.message;
+                      loading_bar.textContent="";
+            });
+          }
+        }
+        
+      }else{
+        errormsg.textContent="Please add medicines";
+        loading_bar.textContent="";
+        document.getElementById('medicine_table').style.display='none';
+      }
+    }
+    
+    document.getElementById('submitbtn').addEventListener('click',Submit);
+
+    function addMedicinetoPatient()
+    {
+
+      var table = document.getElementsByTagName("table")[0]; //first table
+      var rows = table.rows; 
+      var len=rows.length;
+      var obj_m={};
+      var obj_d={}
+      for (var i = 0; i < rows.length; i+=1) {
+        if(i!=0){
+          var emailTr = rows[i];
+          var emailTd = emailTr.cells[0]; //target third column/cell
+          var email = emailTd.innerHTML; //get the value
+          var emailTr2 = rows[i];
+          var emailTd2 = emailTr2.cells[1]; //target third column/cell
+          var email2 = emailTd2.innerHTML;
+          email=email.replace('.','{}');
+          email=email.replace('#','[]'); 
+          email=email.replace('$','<>');
+          obj_m[email]=email2;
+        }
+      }
+
+      var loading_bar=document.getElementById('loading_bar_submit');
+      var errormsg=document.getElementById('error_msg_submit');
+      var loader=document.getElementById('loader_submit');
+
+      var date=new Date();
+      var today=date.getDate()+":"+(date.getMonth()+1)+":"+date.getFullYear();
+      var time=date.getHours()+":"+date.getMinutes();
+      var found=0;
+      var medicine_s='';
+      for (var key in obj_m) {
+          if (obj_m.hasOwnProperty(key)) {
+              var hosRef=firebase.database().ref("Users/"+aadhar_s+"/Medicine/"+hospital_s+"/"+today+"/"+time+"/"+key);
+              medicine_s=key;
+              hosRef.update({
+                          No_of_Days:obj_m[key]
+                },(error)=>{
+                    if(error){
+                        errormsg.textContent=error;
+                        loading_bar.textContent="";
+                        loader.style.display='none';
+                    }else{
+                        addMedicinetoMedical();
+                    }
+                }).catch(function(error) {
+                      loader.style.display="none";
+                      errormsg.textContent=error.message;
+                      loading_bar.textContent="";
+            });
+          }
+        }
+    }
+
+    function addMedicinetoMedical()
+    {
+
+      var table = document.getElementsByTagName("table")[0]; //first table
+      var rows = table.rows; 
+      var len=rows.length;
+      var obj_m={};
+      var obj_d={}
+      for (var i = 0; i < rows.length; i+=1) {
+        if(i!=0){
+          var emailTr = rows[i];
+          var emailTd = emailTr.cells[0]; //target third column/cell
+          var email = emailTd.innerHTML; //get the value
+          var emailTr2 = rows[i];
+          var emailTd2 = emailTr2.cells[1]; //target third column/cell
+          var email2 = emailTd2.innerHTML;
+          email=email.replace('.','{}');
+          email=email.replace('#','[]'); 
+          email=email.replace('$','<>');
+          obj_m[email]=email2;
+        }
+      }
+
+      var loading_bar=document.getElementById('loading_bar_submit');
+      var errormsg=document.getElementById('error_msg_submit');
+      var loader=document.getElementById('loader_submit');
+
+      var date=new Date();
+      var today=date.getDate()+":"+(date.getMonth()+1)+":"+date.getFullYear();
+      var time=date.getHours()+":"+date.getMinutes();
+      var found=0;
+      var medicine_s='';
+      for (var key in obj_m) {
+          if (obj_m.hasOwnProperty(key)) {
+              var hosRef=firebase.database().ref("Hospitals/"+hospital_s+"/Medical/"+aadhar_s+"/"+key);
+              medicine_s=key;
+              hosRef.update({
+                          No_of_Days:obj_m[key]
+                },(error)=>{
+                    if(error){
+                        errormsg.textContent=error;
+                        loading_bar.textContent="";
+                        loader.style.display='none';
+                    }else{
+                        loader.style.display="none";
+                        errormsg.textContent='';
+                        loading_bar.textContent="Sucesss...";
+                        for(var i=0;i<len-1;i++){
+                              document.getElementById("table_medicines").deleteRow(1);
+                        }
+                        document.getElementById('medicine_table').style.display='none';
+                    }
+                }).catch(function(error) {
+                      loader.style.display="none";
+                      errormsg.textContent=error.message;
+                      loading_bar.textContent="";
+            });
+          }
+        }
+    }
+
+    function RefreshBtn(){
+        window.location.reload(true);
+      }
+      document.getElementById("refreshbtn").addEventListener('click',RefreshBtn);
+    
+
+</script>
+    
+  </body>
+</html>

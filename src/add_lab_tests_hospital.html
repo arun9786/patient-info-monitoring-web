@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Medipat</title>
+      <link rel="stylesheet" href="add_lab_tests_hospital.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+      
+   </head>
+   <body>
+    <nav>
+         <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+         </div>
+         <div class="logo">
+            Medipat
+         </div>
+         <div class="nav-items">
+            <li><a href="hospital_home.html">Home</a></li>
+            <li><a href="all_patients_list_hospital.html">Patients</a></li>
+            <li><a href="lab_hospital.html">Lab</a></li>
+            <li><a href="medical_hospital.html">Medical</a></li>
+            <li>
+              <select onchange="moreFun(event)" style="max-width: 50%;background: #171c24;color: #ffffff;font-size: 18px;
+                      font-weight: 500;text-decoration: none;border: none;" >
+                <option><a href="#" >More</a></li></option>
+                <option ><li><a >Add patient</a></li></option>
+                <option ><li><a>Add medicine</a></li></option>
+                <option ><li><a>Add lab tests</a></li></option>
+              </select>
+            </li>
+              
+            
+         </div> 
+         <div class="search-icon">
+            <span class="fas fa-search"></span>
+         </div>
+         <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+         </div>
+      </nav>
+
+        <div class="content_form" id ="content_form">
+          <div class="maindivclass">
+            <div class="formcontainer" id="fetching_form">
+                  <center><span id="loading_bar_fetcher">Please wait while we fetching existing lab test  details...
+                  </span></center>
+                  <span id="error_fetcher" class="error_msg" style="color:red;"></span>
+
+                  <center><img src="img/loader.svg" alt="Error" id="loader_fetcher" /></center>
+                  <span id="no_internet_span" style="color: red;display: none;">Please Check your internet connectivity...</span>
+                  <button id="refreshbtn" >Refresh this page</button></center>
+
+                </div>
+              <div class="maincontainer" id="main_form" style="display: none;">
+                <h1>Add Lab Test Details</h1>
+                <div class="formcontainer">
+                  <div class="formcontainer">
+                          <div class="container">
+                              <label ><strong>Test Type:</strong></label><br/>
+                                  <input type="text" placeholder="Enter lab test type..." id="test_type" required>
+                                  <span>Ex:Blood pressure</span><br/><br/>
+                                <span><b>Test result mode:</b></span><br/>
+                                <select id="test_type_select" onchange="select_mode(event)">
+                                  <option value="Reading" >Reading</option>
+                                  <option value="Report" selected>Report</option>
+                                </select>
+                              </label>
+                              <br/><br/>
+
+                              <center>
+                                <div id="Reading_unit_div" style="display: none;">
+                                  <span>Measured in units of:</span>
+                                  <input type="text" id="measured_unit" style="width: 15%;" />
+                                  <span>Ex:Blood pressure measured in units of mmHg</span>
+                                </div>
+                              </center>
+
+                              <p id="loading_bar_main" style="display: none">Please wait while we updating lab test type details.</p>
+                              <span class="error_msg" id="error_main"></span>
+                              <center><img src="img/loader.svg" alt="error" id="loader_main" style="display: none" /></center>
+
+                              <button id="submit_test">Submit</button>
+                            </center>
+                </div>
+
+                <div id="all_tests_table_d" style="margin-top: 7px;margin-bottom: 5px">
+                  <center><p style="font-size: 25px;font-family: sans-serif;color: #04c939;">All Existing Lab Tests</p></center>
+                    <table id="all_tests_table" style="width: 100%;border: 3px solid #07b536;"
+                          border="3px solid " >
+                      <tr><th width="8%" style="color: #f24018;text-align: center;font-size: 23px;">S.No</th> <th width="70%" style="color: #f24018;text-align: center;font-size: 23px;">Test Type</th> <th style="color: #f24018;text-align: center;font-size: 23px;" width="14%">Result type</th></tr>
+                    </table>
+                </div>
+
+              </div>
+
+          </div>
+        </div>
+      
+
+      <script>
+        function moreFun(x){
+          if(x.target.value=='Add medicine'){
+            window.location.replace('add_medicine_medical.html')
+          }
+          else if(x.target.value=='Add patient'){
+            window.location.replace('add_patient_to_hospital.html')
+          }
+          else if(x.target.value=='Add lab tests'){
+            window.location.replace('add_lab_tests_hospital.html')
+          }
+        }
+
+        function select_mode(x){
+          if(x.target.value=='Reading'){
+            document.getElementById('Reading_unit_div').style.display='block';
+          }
+          else if(x.target.value=='Report'){
+            document.getElementById('Reading_unit_div').style.display='none';
+          }
+        }
+
+
+         const menuBtn = document.querySelector(".menu-icon span");
+         const searchBtn = document.querySelector(".search-icon");
+         const cancelBtn = document.querySelector(".cancel-icon");
+         const items = document.querySelector(".nav-items");
+         const form = document.querySelector("form");
+         menuBtn.onclick = ()=>{
+           items.classList.add("active");
+           menuBtn.classList.add("hide");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+         cancelBtn.onclick = ()=>{
+           items.classList.remove("active");
+           menuBtn.classList.remove("hide");
+           searchBtn.classList.remove("hide");
+           cancelBtn.classList.remove("show");
+           form.classList.remove("active");
+           cancelBtn.style.color = "#ff3d00";
+         }
+         searchBtn.onclick = ()=>{
+           form.classList.add("active");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+      </script>
+
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+
+      var hospital_s="",aadhar_s="";
+
+      var error_msg_fet=document.getElementById('error_fetcher');
+      var loading_bar_fet=document.getElementById('loading_bar_fetcher');
+      var loader_fet=document.getElementById('loader_fetcher');
+
+      window.onload = function() {
+          hospital_s=window.localStorage.getItem("hospital_name");
+          if(navigator.onLine){
+            var test_type_s='',result_type_s='';
+            const dbref=firebase.database().ref();
+            dbref.child("Hospitals").child(hospital_s).child("Lab").child("Tests").once("value",function(snapshotm){
+                      snapshotm.forEach(function(childsnapshot){
+                      test_type_s=childsnapshot.key;
+                      result_type_s=childsnapshot.val().Test_Result_Type;
+
+                      var row=0;
+                      row=document.getElementById('all_tests_table').rows.length;
+                      var x=document.getElementById('all_tests_table').insertRow(row);
+                      var c1=x.insertCell(0);
+                      var c2=x.insertCell(1);
+                      var c3=x.insertCell(2);
+                      c1.innerHTML=row;
+                      c1.style.fontSize='30px';
+                      c1.style.textAlign='center';
+                      c1.style.fontFamily='serif';
+                      c2.innerHTML=test_type_s;
+                      c2.style.fontSize='25px';
+                      c2.style.fontFamily='serif';
+                      c3.innerHTML=result_type_s;
+                      c3.style.fontSize='30px';
+                      c3.style.textAlign='center';
+                      c3.style.fontFamily='serif';
+
+
+                  });
+
+                  document.getElementById('fetching_form').style.display='none';
+                  document.getElementById('main_form').style.display='block';
+                     
+              }).catch((error)=>{
+                  error_msg_fet.textContent=error;
+                  loading_bar_fet.textContent="";
+                  loader_fet.style.display='none';
+                  document.getElementById('main_form').style.display='none';
+              });
+            
+        }else{
+            document.getElementById("no_internet_span").style.display="block";
+            document.getElementById("loader_fetcher").style.display="none";
+            document.getElementById("loading_bar_fetcher").style.display="none";
+            //alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+        }  
+      };
+
+      var error_msg_m=document.getElementById('error_main');
+      var loading_bar_m=document.getElementById('loading_bar_main');
+      var loader_m=document.getElementById('loader_main');
+
+      function Submit(){
+        var test_type_s="";
+        var result_type_s="",reading_nuit_s='';
+        test_type_s=document.getElementById("test_type").value;
+        result_type_s=document.getElementById("test_type_select").value;
+        reading_nuit_s=document.getElementById("measured_unit").value;
+        loading_bar_m.style.display='none';
+        loader_m.style.display='none';
+
+        if(test_type_s.length<3){
+          error_msg_m.textContent="Enter valid test type..."
+        }else if(result_type_s=='Reading' && reading_nuit_s=='')
+          error_msg_m.textContent="Enter reading unit..."
+        else{
+          error_msg_m.textContent="";
+          loading_bar_m.style.display='block';
+          loader_m.style.display='block';
+
+          const dbref=firebase.database().ref();
+
+          var hosRef=firebase.database().ref("Hospitals/"+hospital_s+"/Lab/Tests/"+test_type_s);
+              hosRef.update({
+                          Test_Result_Type:result_type_s,
+                          Reading_Unit:reading_nuit_s
+                },(error)=>{
+                    if(error){
+                        error_msg_m.textContent=error;
+                        loading_bar_m.textContent="";
+                         loader_m.style.display="none";
+                    }else{
+                      alert("Added successfully..");
+                      loader_m.style.display="none";
+                      error_msg_m.textContent="";
+                      loading_bar_m.textContent="";
+                       window.location.reload(true);
+                    }
+                }).catch(function(error) {
+                      error_msg_m.textContent=error;
+                      loading_bar_m.textContent="";
+                      loader_m.style.display="none";
+            });
+        }
+      }
+
+      document.getElementById("submit_test").addEventListener('click',Submit);
+
+      
+      function RefreshBtn(){
+        window.location.reload(true);
+      }
+      refreshbtn.addEventListener('click',RefreshBtn);
+        
+    </script>
+   </body>
+</html>

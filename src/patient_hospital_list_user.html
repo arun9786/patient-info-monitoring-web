@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Medipat</title>
+      <link rel="stylesheet" href="patient_hospital_list_user.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+
+      
+   </head>
+   <body>
+    <nav>
+         <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+         </div>
+         <div class="logo">
+            Medipat
+         </div>
+         <div class="nav-items">
+            <li><a href="patient_medicine_details_user.html" >Home</a></li>
+            <li><a href="#" style="color: red;">Hospitals</a></li>
+         </div>
+         <div class="search-icon">
+            <span class="fas fa-search"></span>
+         </div>
+         <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+         </div>
+      </nav>
+
+         <div class="loadingclass" id="fetching_form">
+                <center><span id="loading_bar_fetcher" style="font-size: 25px;">Please wait...</span></center>
+                <span id="error_fetcher" style="color:red;font-size: 25px;"></span>
+
+                <center><img src="img/loader.svg" alt="Error" id="loader_fetcher" /></center>
+                <span id="no_internet_span" style="color: red;display: none;font-size:25px;">Please Check your internet connectivity...</span>
+                <button id="refreshbtn" >Refresh this page</button></center>
+          </div>
+
+        <div class="content_form" id ="content_form" style="display: none;">
+          <div class="maincontainerform">
+
+             
+          </div>
+          <div class="maincontainer" id="maincontainer_div" style="margin-left: 40px;
+              margin-right: 40px;margin-top: 10px;margin-bottom: 20px;border:3px solid #f2f2f2f2;">
+              <h1 style="text-align: center;" id="hospital_list_id">Hospital List</h1>
+            </div>  
+        </div>  
+      
+         
+      <script>
+         const menuBtn = document.querySelector(".menu-icon span");
+         const searchBtn = document.querySelector(".search-icon");
+         const cancelBtn = document.querySelector(".cancel-icon");
+         const items = document.querySelector(".nav-items");
+         const form = document.querySelector("form");
+         menuBtn.onclick = ()=>{
+           items.classList.add("active");
+           menuBtn.classList.add("hide");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+         cancelBtn.onclick = ()=>{
+           items.classList.remove("active");
+           menuBtn.classList.remove("hide");
+           searchBtn.classList.remove("hide");
+           cancelBtn.classList.remove("show");
+           form.classList.remove("active");
+           cancelBtn.style.color = "#ff3d00";
+         }
+         searchBtn.onclick = ()=>{
+           form.classList.add("active");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+
+      </script>
+
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+
+              // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+      var hospital_s="",aadhar_s="";
+
+      var user_name_s="";
+      var user_aadhar_s="";
+      var user_age_s="";
+      var user_gender_s="";
+      var user_phone_s="";
+      var user_place_s="";
+      var user_address_s="";
+      var user_health_s="";
+
+      window.onload = function() {
+          hospital_s=window.localStorage.getItem("hospital_name");
+          aadhar_s=window.localStorage.getItem("patient_aadhar");
+          if(navigator.onLine){
+            var error_msg_fet=document.getElementById("error_fetcher");
+            var loading_bar_fet=document.getElementById("loading_bar_fetcher");
+            var loader_fet=document.getElementById("loader_fetcher");
+            var refreshbtn=document.getElementById("refreshbtn");
+            loader_fet.style.display='block';
+
+            error_msg_fet.textContent="";
+            loading_bar_fet.textContent="Please wait while we fetching patient ("+aadhar_s+") hospital details...";
+            getHospitalDetails();
+          }else{
+            document.getElementById("no_internet_span").style.display="block";
+            alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+          }
+      };
+
+      function getHospitalDetails(){
+
+        var ref=firebase.database().ref("Users/"+aadhar_s+"/Hospitals").once("value",function(snapshot){
+          if(snapshot.exists()){
+                snapshot.forEach(function(childsnapshot){
+                var key=childsnapshot.key;
+                if(key!=hospital_s){
+                    var linebreak = document.createElement("br");
+                    var visited=childsnapshot.val().Last_Visited;
+                    addHospitalDetailasDiv(key,visited);
+                }
+              });
+          }else{
+            document.getElementById("hospital_list_id").innerHTML='No Hospital found';
+          }
+          document.getElementById("fetching_form").style.display='none';
+          document.getElementById("content_form").style.display='block';
+        }).catch((error)=>{
+                error_msg_fet.textContent=error;
+                loading_bar_fet.textContent="";
+                loader_fet.style.display='none'
+        });
+
+      }
+
+      function addHospitalDetailasDiv(hospital_name,visited){
+                var divs1 = document.createElement("div");
+                divs1.className='childdiv';
+                divs1.style.marginTop='30px';
+                divs1.style.marginLeft='30px';
+                divs1.style.marginRight='30px';
+                divs1.style.marginBottom='40px';
+                divs1.style.color='#050505';
+                divs1.style.fontFamily='sanserif';
+                divs1.style.border='5px';
+                divs1.style.borderStyle='solid';
+                divs1.style.borderColor='#9605a1';
+                                    
+                    var div1 = document.createElement("div");
+                    div1.style.marginRight='50px';
+                                      
+                    var name=document.createElement("h1");
+                    name.innerHTML=hospital_name;
+                    name.style.fontSize='26px';
+                    name.style.marginTop='20px';
+                    name.style.marginBottom='15px';
+
+                    name.style.color='green';
+                    name.style.textAlign='center';
+                    div1.appendChild(name);
+
+                    var visited_label=document.createElement("h2");
+                    visited_label.innerHTML="Last day Visited: "+visited;
+                    visited_label.style.fontSize='22px';
+                    visited_label.style.marginLeft='10px';
+                    visited_label.style.color='#fc0324';
+                    visited_label.style.marginBottom='15px';
+                    visited_label.style.textAlign='center';
+                    div1.appendChild(visited_label);
+                                        
+                    var button = document.createElement("button");
+                    button.innerHTML = "See details";
+                    button.style.color='#1c0270';
+                    button.style.fontWeight='bold';
+                    button.style.backgroundColor='#eba434';
+                    button.style.width='20%';
+                    button.style.marginLeft='40%';
+                    button.addEventListener('click',function(){
+                          window.localStorage.setItem('patient_aadhar',aadhar_s);
+                          window.localStorage.setItem('hospital_selected',hospital_name);
+                          window.location.replace('patient_medicine_details_hospital_user.html')
+                    });
+        div1.appendChild(button);
+        divs1.appendChild(div1);
+                              
+        var divc=document.getElementById("maincontainer_div");
+        divc.appendChild(divs1);
+      }
+
+
+      function RefreshBtn(){
+        window.location.reload(true);
+      }
+      document.getElementById("refreshbtn").addEventListener('click',RefreshBtn);
+        
+    </script>
+   </body>
+</html>

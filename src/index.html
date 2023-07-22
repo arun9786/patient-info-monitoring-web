@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>Mr.Patient</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+  </head>
+
+        <div class="maincontainer">
+          <center><h1>Welcome to Mr.Patient</h1></center>
+          <div class="imgcontainer">
+              <center> <img src="https://firebasestorage.googleapis.com/v0/b/patient-info-monitoring.appspot.com/o/Logo.jpg?alt=media&token=fd5e6ceb-667f-4d4f-96ec-06211e671cd6" 
+                       alt="Check Internet" class="avatar">
+              </center>
+          </div>
+    
+          <div class="container">
+              <button id="hospital_btn">Click here for Hospital</button>
+              <button type="button" class="patient_c1" id="patient_btn">Click here for Patient</button>
+              
+          </div>
+    
+          <div class="container" style="background-color:#f1f1f0">
+              <center><span>Conditions of Use</span> <span>Privacy Notice</span> <span>Help</snap></center>
+          </div>
+        </div>
+
+    <script type="text/javascript">
+
+      window.onload = function() {
+        window.localStorage.setItem('hospital_name',"");
+        window.localStorage.setItem('patient_aadhar',"");
+          if(navigator.onLine){
+          }else{
+              alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+          }
+      };
+
+        function HospitalPage(){
+          window.location.replace('signin_hospital.html')
+        }
+
+        function GoPatientPage(){
+          window.location.replace('signin_user.html')
+        }
+
+        document.getElementById('hospital_btn').addEventListener('click',HospitalPage);
+        document.getElementById('patient_btn').addEventListener('click',GoPatientPage);
+    </script>
+  </body>
+</html>

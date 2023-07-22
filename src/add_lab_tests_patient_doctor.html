@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Medipat</title>
+      <link rel="stylesheet" href="add_lab_tests_patient_doctor.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+      
+   </head>
+   <body>
+    <nav>
+         <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+         </div>
+         <div class="logo">
+            Medipat
+         </div>
+         <div class="nav-items">
+            <li><a href="hospital_home.html">Home</a></li>
+            <li><a href="patient_details_doctor.html">Patient Details</a></li>
+            <li><a href="add_medicine_patient.html">Add medicine</a></li>
+            
+         </div>
+         <div class="search-icon">
+            <span class="fas fa-search"></span>
+         </div>
+         <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+         </div>
+      </nav>
+
+        <div class="content_form" id ="content_form">
+          <div class="maindivclass">
+            <div class="formcontainer" id="fetching_form" >
+                  <center><span id="loading_bar_fetcher">Please wait while we fetching lab test  details...
+                  </span></center>
+                  <span id="error_fetcher" class="error_msg" style="color:red;font-size: 25px;font-weight: bold;"></span>
+
+                  <center><img src="img/loader.svg" alt="Error" id="loader_fetcher" /></center>
+                  <span id="no_internet_span" style="color: red;display: none;">Please Check your internet connectivity...</span>
+                  <button id="refreshbtn" >Refresh this page</button></center>
+
+                </div>
+              <div class="maincontainer" id="main_form" style="display: none;">
+                <h1>Add Lab test details</h1>
+                <div class="formcontainer">
+                          <div class="container">
+                            <h1 id="aadhar_id" style="color: blue;"></h1>
+                              <label ><strong>Test name:</strong></label><br/><br/>
+                                    <span><b>Filter tests</b></span>
+                                      <input type="text" placeholder="Enter test name hint" id="test_filter"  onkeyup="Filter()" required>
+                                  
+                                    <select id="Tests">
+                                      <option value="" selected>Select test</option>
+                                    </select>
+                                  </label>
+                                  
+                                  <br/>
+
+                                  <span id="error_msg" style="color:red;"></span>
+
+                                  <p id="loading_bar_signin"></p>
+                                  <center><img src="img/loader.svg" alt="Error" id="loader_signin" style="display: none" /></center>
+
+                                  <button type="button" id="addtestbtn">Add Test</button>
+
+
+                                  <div id="test_table_div" style="display: none;">
+                                    <table id="table_tests" style="width: 100%;border: 3px solid orange;"
+                                    border="3px solid " >
+                                      <tr><th width="8%" style="color: #050aa8;text-align: center;font-size: 23px;">S.No</th> <th width="70%" style="color: #050aa8;text-align: center;font-size: 23px;">Medicine Name</th> <th style="color: #050aa8;text-align: center;font-size: 23px;" width="10%">No of Days</th></tr>
+                                    </table>
+                                    
+                                  </div>
+
+                                  <span id="error_msg_submit" style="color:red;"></span>
+
+                                  <center><p id="loading_bar_submit" style="font-size: 23px;font-family: sans-serif;color: #04c939;"></p></center>
+                                  <center><img src="img/loader.svg" alt="Error" id="loader_submit" style="display: none" /></center>
+
+
+                                  <div class="container" style="background-color:#f1f1f1">
+                                        <button type="button" class="signupbtn_cl" id="submit_test">Submit</button>
+                                  </div>
+                          </div>
+                </div>
+
+                <div id="all_tests_table_d" style="margin-top: 7px;margin-bottom: 5px">
+                  <center><p style="font-size: 25px;font-family: sans-serif;color: #04c939;">All Existing Lab Tests</p></center>
+                    <table id="all_tests_table" style="width: 100%;border: 3px solid #07b536;"
+                          border="3px solid " >
+                      <tr><th width="8%" style="color: #f24018;text-align: center;font-size: 23px;">S.No</th> <th width="70%" style="color: #f24018;text-align: center;font-size: 23px;">Test Type</th> <th style="color: #f24018;text-align: center;font-size: 23px;" width="14%">Result type</th></tr>
+                    </table>
+                </div>
+              
+
+          </div>
+        </div>
+      
+
+      <script>
+
+         const menuBtn = document.querySelector(".menu-icon span");
+         const searchBtn = document.querySelector(".search-icon");
+         const cancelBtn = document.querySelector(".cancel-icon");
+         const items = document.querySelector(".nav-items");
+         const form = document.querySelector("form");
+         menuBtn.onclick = ()=>{
+           items.classList.add("active");
+           menuBtn.classList.add("hide");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+         cancelBtn.onclick = ()=>{
+           items.classList.remove("active");
+           menuBtn.classList.remove("hide");
+           searchBtn.classList.remove("hide");
+           cancelBtn.classList.remove("show");
+           form.classList.remove("active");
+           cancelBtn.style.color = "#ff3d00";
+         }
+         searchBtn.onclick = ()=>{
+           form.classList.add("active");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+      </script>
+      <script type="text/javascript">
+          function Filter(){
+            var keyword=document.getElementById("test_filter").value.toLowerCase();
+            var sel=document.getElementById("Tests");
+            for(var i=0;i<sel.length;i++){
+              var txt=sel.options[i].text.toLowerCase();
+              if(!txt.match(keyword)){
+                $(sel.options[i]).attr('disabled','disabled').hide();
+              }else{
+                $(sel.options[i]).removeAttr('disabled').show();
+              }
+            }
+          }
+      </script>
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+
+      var hospital_s="",aadhar_s="";
+
+      var error_msg_fet=document.getElementById('error_fetcher');
+      var loading_bar_fet=document.getElementById('loading_bar_fetcher');
+      var loader_fet=document.getElementById('loader_fetcher');
+
+      var obj_m={};
+      var obj_r={};
+
+      window.onload = function() {
+          hospital_s=window.localStorage.getItem("hospital_name");
+          aadhar_s=window.localStorage.getItem("patient_aadhar");
+          document.getElementById("aadhar_id").innerHTML=aadhar_s;
+          var hos_sel=document.getElementById("Tests");
+
+          if(navigator.onLine){
+            var test_type_s='',result_type_s='',reading_unit_s='';
+            const dbref=firebase.database().ref();
+            dbref.child("Hospitals").child(hospital_s).child("Lab").child("Tests").once("value",function(snapshotm){
+
+                if(snapshotm.exists()){
+                  snapshotm.forEach(function(childsnapshot){
+                      test_type_s=childsnapshot.key;
+                      result_type_s=childsnapshot.val().Test_Result_Type;
+                      reading_unit_s=childsnapshot.val().Reading_Unit;
+
+                      obj_m[test_type_s]=result_type_s;
+                      obj_r[test_type_s]=reading_unit_s;
+
+                      var opt=document.createElement('option');
+                      opt.value=test_type_s;
+                      opt.innerHTML=test_type_s;
+                      hos_sel.appendChild(opt);
+
+                      var row=0;
+                      row=document.getElementById('all_tests_table').rows.length;
+                      var x=document.getElementById('all_tests_table').insertRow(row);
+                      var c1=x.insertCell(0);
+                      var c2=x.insertCell(1);
+                      var c3=x.insertCell(2);
+                      c1.innerHTML=row;
+                      c1.style.fontSize='30px';
+                      c1.style.textAlign='center';
+                      c1.style.fontFamily='serif';
+                      c2.innerHTML=test_type_s;
+                      c2.style.fontSize='25px';
+                      c2.style.fontFamily='serif';
+                      c3.innerHTML=result_type_s;
+                      c3.style.fontSize='30px';
+                      c3.style.textAlign='center';
+                      c3.style.fontFamily='serif';
+
+
+                  });
+                  document.getElementById('fetching_form').style.display='none';
+                  document.getElementById('main_form').style.display='block';
+                }else{
+                  error_msg_fet.textContent="No Lab tests found in your hospital. Please add lab tests to your hospital. (In Add tests page).";
+                  loading_bar_fet.textContent="";
+                  loader_fet.style.display='none';
+                  document.getElementById('main_form').style.display='none';
+
+                }
+                         
+              }).catch((error)=>{
+                  error_msg_fet.textContent=error;
+                  loading_bar_fet.textContent="";
+                  loader_fet.style.display='none';
+                  document.getElementById('main_form').style.display='none';
+              });
+
+              sortSelect(hos_sel);
+            
+        }else{
+            document.getElementById("no_internet_span").style.display="block";
+            document.getElementById("loader_fetcher").style.display="none";
+            document.getElementById("loading_bar_fetcher").style.display="none";
+            //alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+        }  
+      };
+
+      var error_msg_m=document.getElementById('error_main');
+      var loading_bar_m=document.getElementById('loading_bar_main');
+      var loader_m=document.getElementById('loader_main');
+
+      
+
+      function AddTests(){
+
+          document.getElementById("loading_bar_submit").textContent="";
+          document.getElementById("error_msg").textContent="";
+          var test_s=document.getElementById("Tests").value;
+
+          var table = document.getElementsByTagName("table")[0]; //first table
+          var rows = table.rows; 
+          var found=0;
+          for (var i = 0; i < rows.length; i+=1) {
+            if(i!=0){
+              var emailTr = rows[i];
+              var emailTd = emailTr.cells[1]; //target third column/cell
+              var email = emailTd.innerHTML; //get the value
+              var emailTr2 = rows[i];
+              var emailTd2 = emailTr2.cells[2]; //target third column/cell
+              var email2 = emailTd2.innerHTML;
+              if(email==test_s){
+                found=1;
+              }
+            }
+          }
+          if(found==0){
+            if(test_s==''){
+              document.getElementById("error_msg").textContent="Please select test...";
+            }
+            else{
+              document.getElementById('error_msg_submit').textContent="";
+
+              document.getElementById('test_table_div').style.display='block';
+              var row=0;
+              row=document.getElementById('table_tests').rows.length;
+              var x=document.getElementById('table_tests').insertRow(row);
+              var c1=x.insertCell(0);
+              var c2=x.insertCell(1);
+              var c3=x.insertCell(2);
+              c1.innerHTML=row;
+              c1.style.fontSize='30px';
+              c1.style.textAlign='center';
+              c1.style.fontFamily='serif';
+              c2.innerHTML=test_s;
+              c2.style.fontSize='25px';
+              c2.style.fontFamily='serif';
+              c3.innerHTML=obj_m[test_s];
+              c3.style.fontSize='30px';
+              c3.style.textAlign='center';
+              c3.style.fontFamily='serif';
+
+            }
+          }else{
+            document.getElementById("error_msg").textContent="Test already added...";
+          }
+      }
+      document.getElementById('addtestbtn').addEventListener('click',AddTests);
+
+
+      function Submit(){
+      var table = document.getElementsByTagName("table")[0]; //first table
+      var rows = table.rows; 
+      var len=rows.length;
+      var obj_d={}
+      for (var i = 0; i < rows.length; i+=1) {
+        if(i!=0){
+          var emailTr = rows[i];
+          var emailTd = emailTr.cells[1]; //target third column/cell
+          var email = emailTd.innerHTML; //get the value
+          var emailTr2 = rows[i];
+          var emailTd2 = emailTr2.cells[2]; //target third column/cell
+          var email2 = emailTd2.innerHTML;
+          email=email.replace('.','{}');
+          email=email.replace('#','[]'); 
+          email=email.replace('$','<>');
+          obj_d[email]=email2;
+        }
+      }
+
+      var loading_bar=document.getElementById('loading_bar_submit');
+      var errormsg=document.getElementById('error_msg_submit');
+      var loader=document.getElementById('loader_submit');
+
+      var date=new Date();
+      var today=date.getDate()+":"+(date.getMonth()+1)+":"+date.getFullYear();
+      var time=date.getHours()+":"+date.getMinutes();
+      var found=0;
+      if(len>1){
+        loading_bar.textContent="Please wait while we add test to "+aadhar_s+" .";
+        errormsg.textContent="";
+        loader.style.display='block';
+        for (var key in obj_d) {
+          if (obj_d.hasOwnProperty(key)) {
+              var hosRef=firebase.database().ref("Hospitals/"+hospital_s+"/Reports/"+aadhar_s+"/"+key);
+              hosRef.update({
+                          Test_Result_Type:obj_d[key],
+                          Reading_Unit:obj_r[key]
+                },(error)=>{
+                    if(error){
+                        errormsg.textContent=error;
+                        loading_bar.textContent="";
+                        loader.style.display='none';
+                    }else{
+                        errormsg.textContent='';
+                        loading_bar.textContent="Successfully Added";
+                        loader.style.display='none';
+                    }
+                }).catch(function(error) {
+                      loader.style.display="none";
+                      errormsg.textContent=error.message;
+                      loading_bar.textContent="";
+                });
+          }
+        }
+        alert("Added successfully");
+
+        for(var i=0;i<len-1;i++){
+          document.getElementById("table_tests").deleteRow(1);
+        }
+        document.getElementById('test_table_div').style.display='none';
+      }else{
+        errormsg.textContent="Please add tests";
+        loading_bar.textContent="";
+        document.getElementById('test_table_div').style.display='none';
+      }
+    }
+    
+    document.getElementById('submit_test').addEventListener('click',Submit);
+      
+      function RefreshBtn(){
+        window.location.reload(true);
+      }
+      refreshbtn.addEventListener('click',RefreshBtn);
+
+    function sortSelect(selElem) {
+          var tmpAry = new Array();
+          for (var i=0;i<selElem.options.length;i++) {
+              tmpAry[i] = new Array();
+              tmpAry[i][0] = selElem.options[i].text;
+              tmpAry[i][1] = selElem.options[i].value;
+          }
+          tmpAry.sort();
+          while (selElem.options.length > 0) {
+              selElem.options[0] = null;
+          }
+          for (var i=0;i<tmpAry.length;i++) {
+              var op = new Option(tmpAry[i][0], tmpAry[i][1]);
+              selElem.options[i] = op;
+          }
+          return;
+      }
+        
+    </script>
+   </body>
+</html>

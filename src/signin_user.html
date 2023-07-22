@@ -1,0 +1,167 @@
+<html>
+  <head>
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="signin_user.css">
+    
+
+  </head>
+        
+        <div class="maincontainer" style="border: 3px solid #f1f1f1;
+        width: 70%;
+        left:20%;
+        top: 15%;
+        right: 20%;
+        margin-top:-100px;
+        margin-left: -100px;
+        position: fixed">
+          <button id="back_btn" style="background-color: #d6ab04;color: white;margin-top: 5px;margin-left: 10px;border: none;cursor: grabbing;width: 12%;font-size: 20px;"> << Back</button>
+          <div class="container">
+            <center><h1>LogIn</h1></center>
+          <div class="imgcontainer">
+              <center> <img src="https://firebasestorage.googleapis.com/v0/b/patient-info-monitoring.appspot.com/o/Logo.jpg?alt=media&token=fd5e6ceb-667f-4d4f-96ec-06211e671cd6" 
+                       alt="Check Internet" class="avatar">
+              </center>
+          </div>
+    
+          <div class="container" style="padding-top: 8px;">
+              <label><b>Aadhar No</b>
+              <input type="number" placeholder="Enter Aadhar No" id="aadhar_no" required>
+              </label>
+    
+              <label><b>Password</b>
+              <input type="password" placeholder="Enter Password" id="password" required>
+              </label><br/>
+              <input type="checkbox" id="show_password_cb"> <label id="label_password" style="font-size: 17px;">Show Password </label><br/>
+              <span id="error_msg"></span>
+              <p id="loading_bar_signin"></p>
+              <center><img src="img/loader.svg" alt="Error" id="loader_signin" style="display: none" /></center>
+              <button id="signinbtn">Login</button>
+              <input type="checkbox" checked="checked"> Remember me
+          </div>
+    
+          <div class="container" style="background-color:#f1f1f1">
+              <button type="button" class="signupbtn_cl" id="signupbtn">SignUp</button>
+              <span class="psw"><a href="#" id="forgot_password_btn">Forgot password?</a></span>
+          </div>
+        </div>
+
+          </div>
+          
+    
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+
+              // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+
+
+        var signin_btn=document.getElementById('signinbtn');
+        var signup_btn=document.getElementById('signupbtn');
+        var forgotpassword_btn=document.getElementById('forgot_password_btn');
+        var error_msg=document.getElementById('error_msg');
+        var loading_bar=document.getElementById('loading_bar_signin');
+        var loader_signin=document.getElementById('loader_signin');
+
+        function InsertData(){
+          if(navigator.onLine){
+            var aadhar_s=document.getElementById('aadhar_no').value;
+            var pass_orginal=document.getElementById('password').value;
+            
+            if(aadhar_s.length!=12){
+              error_msg.textContent="Please enter a valid aadhar number. Length must be 12."
+              loading_bar.textContent="";
+            }else if(pass_orginal.length<6){
+              error_msg.textContent="Please enter a Password. Length must be more than 6."
+              loading_bar.textContent="";
+            }else{
+              const dbref=firebase.database().ref();
+              error_msg.textContent="";
+              loading_bar.textContent="Please wait while we verifying your account.";
+              loader_signin.style.display='block';
+              document.getElementById("signinbtn").disabled=true;
+              dbref.child("Users").child(aadhar_s).once("value",function(snapshot){
+                  if(snapshot.exists()){
+                      var pass_db=snapshot.val().Password;
+                      if(pass_db==pass_orginal){
+                          document.getElementById("signinbtn").disabled=false;
+                          loader_signin.style.display='none';
+                          window.localStorage.setItem('patient_aadhar',aadhar_s);
+                          window.location.replace('patient_medicine_details_user.html')
+                          error_msg.textContent="";
+                          loading_bar.textContent="";
+                      }else{
+                        document.getElementById("signinbtn").disabled=false;
+                        error_msg.textContent="Aadhar number and password are not match.";
+                        loading_bar.textContent="";
+                        loader_signin.style.display='none';
+                      }
+                  }else{
+                      document.getElementById("signinbtn").disabled=false;
+                      error_msg.textContent="Please enter a valid aadhar number. You are not user. Please create account using this aadhar number";
+                      loading_bar.textContent="";
+                      loader_signin.style.display='none';
+                  }
+              }).catch((error)=>{
+                  document.getElementById("signinbtn").disabled=false;
+                  error_msg.textContent=error;
+                  loading_bar.textContent="";
+                  loader_signin.style.display='none';
+
+              });
+            }
+          }else{
+            alert("Oops! You're offline. Please check your network connection...")
+          }
+        }
+
+        function GoSignupPage(){
+          window.location.replace('signup.html')
+        }
+
+        function GoForgotPasswordPage(){
+          window.location.replace('forgotpassword.html')
+        }
+
+        function ShowPassword(){
+          var pass_edt=document.getElementById("password");
+          var label_pass=document.getElementById("label_password");
+          if(pass_edt.type==="password"){
+            pass_edt.type="text";
+            label_pass.innerHTML="Hide Password";
+          }else{
+            pass_edt.type="password";
+            label_pass.innerHTML="Show Password";
+          }
+        }
+
+        document.getElementById("show_password_cb").addEventListener('click',ShowPassword);
+        signin_btn.addEventListener('click',InsertData);
+        signup_btn.addEventListener('click',GoSignupPage);
+        forgotpassword_btn.addEventListener('click',GoForgotPasswordPage);
+
+        function Back(){
+            window.location.replace("index.html")
+        }
+        document.getElementById("back_btn").addEventListener('click',Back);
+    </script>
+  </body>
+</html>

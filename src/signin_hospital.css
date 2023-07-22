@@ -1,0 +1,75 @@
+.maindivclass{
+  padding-left:140px;
+  padding-right: 140px; 
+  padding-bottom: 30px;
+}
+
+.maincontainer {
+    border: 5px solid #f1f1f1;
+    
+  }
+
+  input[type=text],
+    input[type=password],
+    input[type=number] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+button {
+    background-color: #8ebf42;
+    color: white;
+    padding: 14px 0;
+    margin: 10px 0;
+    border: none;
+    cursor: grabbing;
+    width: 100%;
+    font-size: 20px;
+}
+
+h1 {
+    text-align: center;
+    fone-size: 18;
+    color: green;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.formcontainer {
+    text-align: left;
+    margin: 24px 50px 12px;
+}
+
+.container {
+    margin-top: 40px;
+    text-align: left;
+}
+
+.signupbtn_cl {
+        width: 100%;
+        padding: 10px 18px;
+        background-color: #f44336;
+        float: center;
+    }
+select{
+    border-color: #13FC14;
+    padding: 0 1em 0 0;
+    margin: 8px 0;
+    font-size: 20px;
+    height: 50px;
+    width: 100%
+}
+
+label{
+    font-size: 22px;
+}
+
+span{
+    font-size: 20px;
+}

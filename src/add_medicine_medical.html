@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Medipat</title>
+      <link rel="stylesheet" href="add_medicine_medical.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+      
+   </head>
+   <body>
+    <nav>
+         <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+         </div>
+         <div class="logo">
+            Medipat
+         </div>
+         <div class="nav-items">
+            <li><a href="hospital_home.html">Home</a></li>
+            <li><a href="all_patients_list_hospital.html">Patients</a></li>
+            <li><a href="lab_hospital.html">Lab</a></li>
+            <li><a href="medical_hospital.html">Medical</a></li>
+            <li>
+              <select onchange="moreFun(event)" style="max-width: 50%;background: #171c24;color: #ffffff;font-size: 18px;
+                      font-weight: 500;text-decoration: none;border: none;" >
+                <option><a href="#" >More</a></li></option>
+                <option ><li><a >Add patient</a></li></option>
+                <option ><li><a>Add medicine</a></li></option>
+                <option ><li><a>Add lab tests</a></li></option>
+              </select>
+            </li>
+              
+            
+         </div> 
+         <div class="search-icon">
+            <span class="fas fa-search"></span>
+         </div>
+         <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+         </div>
+      </nav>
+
+        <div class="content_form" id ="content_form">
+          <div class="maincontainerform">
+
+            <div class="formcontainer">
+              <div class="containers">
+                <label ><strong>Medicine Name:</strong></label><br/><br/>
+                  <span><b>Filter medicine</b></span>
+                  <input type="text" placeholder="Enter medicine or disease name hint" id="medicine_filter"  onkeyup="Filter()" required style="width: 100%;padding: 16px 8px;margin: 8px 0;display: inline-block;border: 1px solid #ccc;box-sizing: border-box;font-size: 20px;">
+
+                  <select onchange="medicineFun(event)" id="medicines">
+                      <option value="" selected>Select medicine</option>
+                  </select>
+
+                  <div class="medicine_form" style="margin-left: 100px;margin-top: 20px;">
+                    <label class="label_timing">Taking Timing:</label><br/><br/>
+                    <div style="margin-left: 50px;">
+                      <input type="radio" id="timing" name="timing" value="Before food" checked=""> <label class="label_timing">Before food   </label>
+                      <input type="radio" name="timing" value="After food"> <label class="label_timing">After food   </label><br/>
+                      <input type="checkbox"  id="morinig" value="morinig"> <label class="label_timing">Morning</label><br/>
+                      <input type="checkbox" id="afternoon" value="afternoon"> <label class="label_timing">Afternoon</label><br/>
+                      <input type="checkbox" id="evening" value="evening"> <label class="label_timing">Evening</label><br/>
+                      <input type="checkbox" id="night" value="night"> <label class="label_timing">Night</label>
+                    </div>
+                    
+                  </div>
+
+                  <span id="errormsg" class="error_msg" style="font-size: 20px;color: red;"></span>
+                  <p id="loading_bar"></p>
+                  <center><img src="img/loader.svg" alt="Error" id="loader" style="display: none" /></center>
+
+                  <button id="savebtn" >Save</button>
+              </div>
+              
+            </div>
+
+            </div>
+          </div>  
+        </div>
+      
+
+      <script>
+        function moreFun(x){
+          if(x.target.value=='Add medicine'){
+            window.location.replace('add_medicine_medical.html')
+          }
+          else if(x.target.value=='Add patient'){
+            window.location.replace('add_patient_to_hospital.html')
+          }
+          else if(x.target.value=='Add lab tests'){
+            window.location.replace('add_lab_tests_hospital.html')
+          }
+        }
+
+        function medicineFun(x){
+          if(x.target.value=='Add medicine'){
+            window.location.replace('add_medicine_medical.html')
+          }
+        }
+
+        function Filter(){
+            var keyword=document.getElementById("medicine_filter").value.toLowerCase();
+            var sel=document.getElementById("medicines");
+            for(var i=0;i<sel.length;i++){
+              var txt=sel.options[i].text.toLowerCase();
+              if(!txt.match(keyword)){
+                $(sel.options[i]).attr('disabled','disabled').hide();
+              }else{
+                $(sel.options[i]).removeAttr('disabled').show();
+              }
+            }
+          }
+
+         const menuBtn = document.querySelector(".menu-icon span");
+         const searchBtn = document.querySelector(".search-icon");
+         const cancelBtn = document.querySelector(".cancel-icon");
+         const items = document.querySelector(".nav-items");
+         const form = document.querySelector("form");
+         menuBtn.onclick = ()=>{
+           items.classList.add("active");
+           menuBtn.classList.add("hide");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+         cancelBtn.onclick = ()=>{
+           items.classList.remove("active");
+           menuBtn.classList.remove("hide");
+           searchBtn.classList.remove("hide");
+           cancelBtn.classList.remove("show");
+           form.classList.remove("active");
+           cancelBtn.style.color = "#ff3d00";
+         }
+         searchBtn.onclick = ()=>{
+           form.classList.add("active");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+
+      </script>
+
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+
+              // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+      var hospital_s="",aadhar_s="";
+
+      window.onload = function() {
+          hospital_s=window.localStorage.getItem("hospital_name");
+          if(navigator.onLine){
+            readTextFile("Json/Druglist.json",function(text){
+              var data=JSON.parse(text);
+              var med_sel=document.getElementById("medicines");
+              for(let i=0;i<data.length;i++){
+                  var opt=document.createElement('option');
+                  if(data[i].Packing!=''){
+                    opt.value=data[i].Nomenclature+" , "+data[i].Packing+", "+data[i].Accounting_Unit;
+                    opt.innerHTML=data[i].Nomenclature+" , "+data[i].Packing+", "+data[i].Accounting_Unit;
+                  }else{
+                    opt.value=data[i].Nomenclature;
+                    opt.innerHTML=data[i].Nomenclature;
+                  }
+                  
+                  med_sel.appendChild(opt);  
+              }
+              sortSelect(med_sel);
+            });
+          }else{
+            document.getElementById("no_internet_span").style.display="block";
+            //alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+          }  
+      };
+
+      function readTextFile(file,callback){
+
+        var rawfile=new XMLHttpRequest();
+        rawfile.overrideMimeType("application/json");
+        rawfile.open("GET",file,true);
+        rawfile.onreadystatechange=function(){
+          if(rawfile.readyState===4 && rawfile.status=="200"){
+            callback(rawfile.responseText);
+          }
+        }
+        rawfile.send(null);
+      }
+
+      function sortSelect(selElem) {
+          var tmpAry = new Array();
+          for (var i=0;i<selElem.options.length;i++) {
+              tmpAry[i] = new Array();
+              tmpAry[i][0] = selElem.options[i].text;
+              tmpAry[i][1] = selElem.options[i].value;
+          }
+          tmpAry.sort();
+          while (selElem.options.length > 0) {
+              selElem.options[0] = null;
+          }
+          for (var i=0;i<tmpAry.length;i++) {
+              var op = new Option(tmpAry[i][0], tmpAry[i][1]);
+              selElem.options[i] = op;
+          }
+          return;
+      }
+
+      function SaveMedicine(){
+          var timing = document.querySelector('input[name="timing"]:checked').value;
+          var medicine_s=document.getElementById("medicines").value;
+          var morinig_s=false,afternoon_s=false,evening_s=false,night_s=false;
+          if(document.getElementById('morinig').checked){
+            morinig_s=true;
+          }
+          if(document.getElementById('afternoon').checked){
+            afternoon_s=true;
+          }
+          if(document.getElementById('evening').checked){
+            evening_s=true;
+          }
+          if(document.getElementById('night').checked){
+            night_s=true;
+          }
+          if(morinig_s==true || afternoon_s==true || evening_s==true || night_s==true){
+            loading_bar.textContent="Please wait while we save medicine details..."
+                errormsg.textContent="";
+                loader.style.display='block';
+                document.getElementById('savebtn').disabled=true;
+                const dbref=firebase.database().ref();  
+                medicine_s=medicine_s.replace('.','{}');
+                medicine_s=medicine_s.replace('#','[]'); 
+                medicine_s=medicine_s.replace('$','<>');                 
+                
+                var userRef=firebase.database().ref("Hospitals/"+hospital_s+"/Medicine/"+medicine_s);
+                userRef.update({
+                          Timing:timing,
+                          Morning:morinig_s,
+                          Afternoon:afternoon_s,
+                          Evening:evening_s,
+                          Night:night_s
+                },(error)=>{
+                    if(error){
+                        errormsg.textContent=error;
+                        loading_bar.textContent="";
+                        loader.style.display='none';
+                        document.getElementById('savebtn').disabled=false;
+                    }else{
+                        alert("Medicine added successfully in to your hospital database...");
+                        loader.style.display="none";
+                        errormsg.textContent='';
+                        loading_bar.textContent="";
+                        document.getElementById('savebtn').disabled=false;
+                        window.location.reload(true);
+                    }
+                }).catch(function(error) {
+                      loader.style.display="none";
+                      errormsg.textContent=error.message;
+                      loading_bar.textContent="";
+                      document.getElementById('savebtn').disabled=false;
+                });
+          }else{
+            errormsg.textContent="Click the timing...";
+          }
+                
+      }
+      document.getElementById('savebtn').addEventListener('click',SaveMedicine);
+        
+    </script>
+   </body>
+</html>

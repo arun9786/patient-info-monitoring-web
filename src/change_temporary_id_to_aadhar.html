@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Medipat</title>
+      <link rel="stylesheet" href="change_temporary_id_to_aadhar.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+      
+   </head>
+   <body>
+    <nav>
+         <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+         </div>
+         <div class="logo">
+            Medipat
+         </div>
+         <div class="nav-items">
+            <li><a href="hospital_home.html">Home</a></li>
+            <li><a href="all_patients_list_hospital.html">Patients</a></li>
+            <li><a href="lab_hospital.html">Lab</a></li>
+            <li><a href="medical_hospital.html">Medical</a></li>
+            <li>
+              <select onchange="moreFun(event)" style="max-width: 50%;background: #171c24;color: #ffffff;font-size: 18px;
+                      font-weight: 500;text-decoration: none;border: none;" >
+                <option><a href="#">More</a></li></option>
+                <option ><li><a>Add patient</a></li></option>
+                <option ><li><a>Add medicine</a></li></option>
+              </select>
+         </div>
+         <div class="search-icon">
+            <span class="fas fa-search"></span>
+         </div>
+         <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+         </div>
+      </nav>
+
+        <div class="content_form" id ="content_form">
+
+          <div  id="main_div" class="maindivclass">
+            <div class="maincontainer">
+              <h1>Change temporary ID to Aadhar number</h1>
+
+              <h2 id="temporaryid_id" style="margin-top: 20px;margin-bottom: 20px;"></h2>
+
+              <span>Aadhar number:</span> 
+
+              <input type="number" id="aadhar_number" placeholder="Enter aadhar number" style="margin-top: 15px;"/><br/>
+
+              <p id="loading_bar" style="font-size: 20px;margin-left: 15%;margin-top: 10px;display: none;">Please wait...</p>
+              <center><img src="img/loader.svg" alt="Error" id="loader" style="display: none;" /></center>
+              <span id="error_msg" style="color: red;margin-bottom: 5px;display: none;margin-right: 20%;" >Error</span><br/><br/>
+              
+              <button id="submitbtn">Change</button>
+            </div>
+
+          </div>
+        </div>
+      
+
+      <script>
+
+         const menuBtn = document.querySelector(".menu-icon span");
+         const searchBtn = document.querySelector(".search-icon");
+         const cancelBtn = document.querySelector(".cancel-icon");
+         const items = document.querySelector(".nav-items");
+         const form = document.querySelector("form");
+         menuBtn.onclick = ()=>{
+           items.classList.add("active");
+           menuBtn.classList.add("hide");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+         cancelBtn.onclick = ()=>{
+           items.classList.remove("active");
+           menuBtn.classList.remove("hide");
+           searchBtn.classList.remove("hide");
+           cancelBtn.classList.remove("show");
+           form.classList.remove("active");
+           cancelBtn.style.color = "#ff3d00";
+         }
+         searchBtn.onclick = ()=>{
+           form.classList.add("active");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+      </script>
+
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+
+      var hospital_s="",aadhar_s="",temp_id="",last_visit="";
+
+      window.onload = function() {
+          hospital_s=window.localStorage.getItem("hospital_name");
+          temp_id=window.localStorage.getItem("patient_temporary_id");
+          if(navigator.onLine){
+            var date=new Date();
+            var today=date.getDate()+":"+(date.getMonth()+1)+":"+date.getFullYear();
+            var time=date.getHours()+":"+date.getMinutes();
+            last_visit=today;
+            document.getElementById("temporaryid_id").innerHTML="Temporary Patient ID: "+temp_id;
+            
+          }else{  
+            alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+          }  
+      };
+
+      function Submit(){
+        aadhar_s=document.getElementById("aadhar_number").value;
+        document.getElementById("loading_bar").style.display='none';
+        document.getElementById("loader").style.display='none';
+        document.getElementById("error_msg").style.display='none';
+        document.getElementById("error_msg").innerHTML="";
+        if(aadhar_s.length!=12){
+          document.getElementById("error_msg").innerHTML="Enter valid aadhar number";
+          document.getElementById("error_msg").style.display='block';
+        }else{
+          document.getElementById("loading_bar").style.display='block';
+          document.getElementById("loader").style.display='block';
+          document.getElementById("error_msg").style.display='none';
+          var ref=firebase.database().ref();
+          ref.child("Users").child(aadhar_s).once("value",function(snapshot){
+            if(!snapshot.exists()){
+              document.getElementById("error_msg").style.display='block';
+              document.getElementById("error_msg").innerHTML="Patient not have account in Medipat (or) Check have you entered correct aadhar number.";
+              document.getElementById("loading_bar").style.display='none';
+              document.getElementById("loader").style.display='none';
+            }else{
+              ref.child("Hospitals").child(hospital_s).child("Patients").child(aadhar_s).once("value",function(snapshot){
+                if(snapshot.exists()){
+                  updateHospital();
+                }else{
+                  document.getElementById("error_msg").style.display='block';
+                  document.getElementById("error_msg").innerHTML="Patient is not in your hospital patient list. Please add patient to your hospital.";
+                  document.getElementById("loading_bar").style.display='none';
+                  document.getElementById("loader").style.display='none';
+                }
+              }).catch((error)=>{
+                document.getElementById("loading_bar").style.display='none';
+                document.getElementById("loader").style.display='none';
+                document.getElementById("error_msg").style.display='block';
+                document.getElementById("error_msg").innerHTML=error;
+              });
+            }
+          }).catch((error)=>{
+            document.getElementById("loading_bar").style.display='none';
+            document.getElementById("loader").style.display='none';
+            document.getElementById("error_msg").style.display='block';
+            document.getElementById("error_msg").innerHTML=error;
+          });
+        }
+      }
+
+      document.getElementById("submitbtn").addEventListener('click',Submit);
+
+      function updateHospital(){
+        updateLastdateVisited();
+        updateHospitalMedicine();
+        updateHospitalReports();
+        updateMedicalMedicine();
+        updateLabReport();
+      }
+
+      function updateLastdateVisited(){
+        var ref=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+temp_id).once("value",function(snapshot){
+          if(snapshot.exists()){
+            var visited=snapshot.val().Last_Visited;
+            last_visit=visited;
+            if(visited!=null){
+                var hosref=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+aadhar_s);
+                hosref.update({
+                              Last_Visited:visited
+                },(error)=>{
+                    if(error){
+                        document.getElementById("loading_bar").style.display='none';
+                        document.getElementById("loader").style.display='none';
+                        document.getElementById("error_msg").style.display='block';
+                        document.getElementById("error_msg").innerHTML=error;
+                    }
+                }).catch(function(error) {
+                    document.getElementById("loading_bar").style.display='none';
+                    document.getElementById("loader").style.display='none';
+                    document.getElementById("error_msg").style.display='block';
+                    document.getElementById("error_msg").innerHTML=error;
+                });
+            }
+          }
+            
+            
+        }).catch((error)=>{
+            document.getElementById("loading_bar").style.display='none';
+            document.getElementById("loader").style.display='none';
+            document.getElementById("error_msg").style.display='block';
+            document.getElementById("error_msg").innerHTML=error;
+        });
+      }
+
+      function updateHospitalMedicine(){
+        var ref=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+temp_id+"/Medicine").once("value",function(snapshot){
+          if(snapshot.exists()){
+            snapshot.forEach(function(childsnapshot){
+                var date=childsnapshot.key;
+                
+                    var Ref=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+temp_id+"/Medicine/"+date).once("value",function(timesnapshot){
+                          timesnapshot.forEach(function(timechildsnapshot){
+                              var time=timechildsnapshot.key;
+
+                                timechildsnapshot.forEach(function(mainsnapshot){
+                                  var medicine=mainsnapshot.key;
+                                  var days=mainsnapshot.val().No_of_Days;
+
+                                  var mediRef=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+aadhar_s+"/Medicine/"+date+"/"+time+"/"+medicine);
+                                  mediRef.update({
+                                                No_of_Days:days
+                                  },(error)=>{
+                                      if(error){
+                                          document.getElementById("loading_bar").style.display='none';
+                                          document.getElementById("loader").style.display='none';
+                                          document.getElementById("error_msg").style.display='block';
+                                          document.getElementById("error_msg").innerHTML=error;
+                                      }
+                                  }).catch(function(error) {
+                                      document.getElementById("loading_bar").style.display='none';
+                                      document.getElementById("loader").style.display='none';
+                                      document.getElementById("error_msg").style.display='block';
+                                      document.getElementById("error_msg").innerHTML=error;
+                                  });
+
+                                });
+                          });
+                    }).catch((error)=>{
+                        document.getElementById("loading_bar").style.display='none';
+                        document.getElementById("loader").style.display='none';
+                        document.getElementById("error_msg").style.display='block';
+                        document.getElementById("error_msg").innerHTML=error;
+                    });   
+            });
+            
+          }
+        }).catch((error)=>{
+            document.getElementById("loading_bar").style.display='none';
+            document.getElementById("loader").style.display='none';
+            document.getElementById("error_msg").style.display='block';
+            document.getElementById("error_msg").innerHTML=error;
+        });
+      }
+
+      function updateHospitalReports(){
+        var ref=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+temp_id+"/Reports").once("value",function(snapshot){
+          if(snapshot.exists()){
+            snapshot.forEach(function(childsnapshot){
+                var date=childsnapshot.key;
+                
+                    var Ref=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+temp_id+"/Reports/"+date).once("value",function(timesnapshot){
+                          timesnapshot.forEach(function(timechildsnapshot){
+                              var time=timechildsnapshot.key;
+
+                                timechildsnapshot.forEach(function(mainsnapshot){
+                                  var medicine=mainsnapshot.key;
+                                  var url=mainsnapshot.val().URL;
+                                  if(url==null){
+                                    var unit=mainsnapshot.val().Reading_Unit;
+                                    var value=mainsnapshot.val().Reading_Value;
+                                    var mediRef=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+aadhar_s+"/Reports/"+date+"/"+time+"/"+medicine);
+                                      mediRef.update({
+                                                    Reading_Unit:unit,
+                                                    Reading_Value:value
+                                      },(error)=>{
+                                          if(error){
+                                              document.getElementById("loading_bar").style.display='none';
+                                              document.getElementById("loader").style.display='none';
+                                              document.getElementById("error_msg").style.display='block';
+                                              document.getElementById("error_msg").innerHTML=error;
+                                          }
+                                      }).catch(function(error) {
+                                          document.getElementById("loading_bar").style.display='none';
+                                          document.getElementById("loader").style.display='none';
+                                          document.getElementById("error_msg").style.display='block';
+                                          document.getElementById("error_msg").innerHTML=error;
+                                      });
+                                  }
+                                  else{
+                                    var mediRef=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+aadhar_s+"/Reports/"+date+"/"+time+"/"+medicine);
+                                      mediRef.update({
+                                                    URL:url
+                                      },(error)=>{
+                                          if(error){
+                                              document.getElementById("loading_bar").style.display='none';
+                                              document.getElementById("loader").style.display='none';
+                                              document.getElementById("error_msg").style.display='block';
+                                              document.getElementById("error_msg").innerHTML=error;
+                                          }
+                                      }).catch(function(error) {
+                                          document.getElementById("loading_bar").style.display='none';
+                                          document.getElementById("loader").style.display='none';
+                                          document.getElementById("error_msg").style.display='block';
+                                          document.getElementById("error_msg").innerHTML=error;
+                                      });
+                                  }
+                                  
+
+                                });
+                          });
+                    }).catch((error)=>{
+                        document.getElementById("loading_bar").style.display='none';
+                        document.getElementById("loader").style.display='none';
+                        document.getElementById("error_msg").style.display='block';
+                        document.getElementById("error_msg").innerHTML=error;
+                    });   
+            });   
+          }
+        }).catch((error)=>{
+            document.getElementById("loading_bar").style.display='none';
+            document.getElementById("loader").style.display='none';
+            document.getElementById("error_msg").style.display='block';
+            document.getElementById("error_msg").innerHTML=error;
+        });
+      }
+
+      function updateMedicalMedicine(){
+        var ref=firebase.database().ref("Hospitals/"+hospital_s+"/Medical/"+temp_id).once("value",function(snapshot){
+          if(snapshot.exists()){
+            snapshot.forEach(function(childsnapshot){
+                var name=childsnapshot.key;
+
+                var days=childsnapshot.val().No_of_Days;
+                var mediRef=firebase.database().ref("Hospitals/"+hospital_s+"/Medical/"+aadhar_s+"/"+name);
+                mediRef.update({
+                      No_of_Days:days
+                },(error)=>{
+                    if(error){
+                      document.getElementById("loading_bar").style.display='none';
+                      document.getElementById("loader").style.display='none';
+                      document.getElementById("error_msg").style.display='block';
+                      document.getElementById("error_msg").innerHTML=error;
+                    }
+                }).catch(function(error) {
+                    document.getElementById("loading_bar").style.display='none';
+                    document.getElementById("loader").style.display='none';
+                    document.getElementById("error_msg").style.display='block';
+                    document.getElementById("error_msg").innerHTML=error;
+                });
+                                  
+              });
+            var ref = firebase.database().ref("Hospitals/"+hospital_s+"/Medical/"+temp_id);
+            ref.remove();            
+          }
+        }).catch((error)=>{
+            document.getElementById("loading_bar").style.display='none';
+            document.getElementById("loader").style.display='none';
+            document.getElementById("error_msg").style.display='block';
+            document.getElementById("error_msg").innerHTML=error;
+        });
+      }
+
+      function updateLabReport(){
+        var ref=firebase.database().ref("Hospitals/"+hospital_s+"/Reports/"+temp_id).once("value",function(snapshot){
+          if(snapshot.exists()){
+            snapshot.forEach(function(childsnapshot){
+                var name=childsnapshot.key;
+
+                var type=childsnapshot.val().Test_Result_Type;
+                var unit="";
+                unit=childsnapshot.val().Reading_Unit;
+
+                    var mediRef=firebase.database().ref("Hospitals/"+hospital_s+"/Reports/"+aadhar_s+"/"+name);
+                    mediRef.update({
+                          Test_Result_Type:type,
+                          Reading_Unit:unit
+                    },(error)=>{
+                        if(error){
+                          document.getElementById("loading_bar").style.display='none';
+                          document.getElementById("loader").style.display='none';
+                          document.getElementById("error_msg").style.display='block';
+                          document.getElementById("error_msg").innerHTML=error;
+                        }
+                    }).catch(function(error) {
+                        document.getElementById("loading_bar").style.display='none';
+                        document.getElementById("loader").style.display='none';
+                        document.getElementById("error_msg").style.display='block';
+                        document.getElementById("error_msg").innerHTML=error;
+                    });
+                                  
+              });
+            var ref = firebase.database().ref("Hospitals/"+hospital_s+"/Reports/"+temp_id);
+            ref.remove();            
+          }
+        }).catch((error)=>{
+            document.getElementById("loading_bar").style.display='none';
+            document.getElementById("loader").style.display='none';
+            document.getElementById("error_msg").style.display='block';
+            document.getElementById("error_msg").innerHTML=error;
+        });
+        updateUser();
+      }
+
+      function updateUser(){
+        updateAllHospitalListUser();
+        updateAllMedicineUser();
+        updateAllReportUser();
+      }
+
+      function updateAllHospitalListUser(){
+        var mediRef=firebase.database().ref("Users/"+aadhar_s+"/Hospitals/"+hospital_s);
+            mediRef.update({
+                  Last_Visited:last_visit
+            },(error)=>{
+                if(error){
+                  document.getElementById("loading_bar").style.display='none';
+                  document.getElementById("loader").style.display='none';
+                  document.getElementById("error_msg").style.display='block';
+                  document.getElementById("error_msg").innerHTML=error;
+                }        
+            }).catch((error)=>{
+                document.getElementById("loading_bar").style.display='none';
+                document.getElementById("loader").style.display='none';
+                document.getElementById("error_msg").style.display='block';
+                document.getElementById("error_msg").innerHTML=error;
+            });        
+      }
+
+      function updateAllMedicineUser(){
+        var ref=firebase.database().ref("Users/"+temp_id+"/Medicine/"+hospital_s).once("value",function(snapshot){
+          if(snapshot.exists()){
+              snapshot.forEach(function(childsnapshot){
+                    var date=childsnapshot.key;
+                    
+                        var Ref=firebase.database().ref("Users/"+temp_id+"/Medicine/"+hospital_s+"/"+date).once("value",function(timesnapshot){
+                              timesnapshot.forEach(function(timechildsnapshot){
+                                  var time=timechildsnapshot.key;
+
+                                    timechildsnapshot.forEach(function(mainsnapshot){
+                                      var medicine=mainsnapshot.key;
+                                      var days=mainsnapshot.val().No_of_Days;
+
+                                      var mediRef=firebase.database().ref("Users/"+aadhar_s+"/Medicine/"+hospital_s+"/"+date+"/"+time+"/"+medicine);
+                                      mediRef.update({
+                                                    No_of_Days:days
+                                      },(error)=>{
+                                          if(error){
+                                              document.getElementById("loading_bar").style.display='none';
+                                              document.getElementById("loader").style.display='none';
+                                              document.getElementById("error_msg").style.display='block';
+                                              document.getElementById("error_msg").innerHTML=error;
+                                          }
+                                      }).catch(function(error) {
+                                          document.getElementById("loading_bar").style.display='none';
+                                          document.getElementById("loader").style.display='none';
+                                          document.getElementById("error_msg").style.display='block';
+                                          document.getElementById("error_msg").innerHTML=error;
+                                      });
+
+                                    });
+                              });
+                        }).catch((error)=>{
+                            document.getElementById("loading_bar").style.display='none';
+                            document.getElementById("loader").style.display='none';
+                            document.getElementById("error_msg").style.display='block';
+                            document.getElementById("error_msg").innerHTML=error;
+                        });   
+              });
+                                    
+          }
+        }).catch((error)=>{
+            document.getElementById("loading_bar").style.display='none';
+            document.getElementById("loader").style.display='none';
+            document.getElementById("error_msg").style.display='block';
+            document.getElementById("error_msg").innerHTML=error;
+        });
+      }
+
+      function updateAllReportUser(){
+        var ref=firebase.database().ref("Users/"+temp_id+"/Reports/"+hospital_s).once("value",function(snapshot){
+          if(snapshot.exists()){
+              
+              snapshot.forEach(function(childsnapshot){
+                    var date=childsnapshot.key;
+                    
+                        var Ref=firebase.database().ref("Users/"+temp_id+"/Reports/"+hospital_s+"/"+date).once("value",function(timesnapshot){
+                              timesnapshot.forEach(function(timechildsnapshot){
+                                  var time=timechildsnapshot.key;
+
+                                    timechildsnapshot.forEach(function(mainsnapshot){
+                                      var test=mainsnapshot.key;
+                                      var url=mainsnapshot.val().URL;
+                                      if(url==null){
+                                        var unit=mainsnapshot.val().Reading_Unit;
+                                        var value=mainsnapshot.val().Reading_Value;
+                                        var mediRef=firebase.database().ref("Users/"+aadhar_s+"/Reports/"+hospital_s+"/"+date+"/"+time+"/"+test);
+                                        mediRef.update({
+                                                        Reading_Unit:unit,
+                                                        Reading_Value:value
+                                          },(error)=>{
+                                              if(error){
+                                                  document.getElementById("loading_bar").style.display='none';
+                                                  document.getElementById("loader").style.display='none';
+                                                  document.getElementById("error_msg").style.display='block';
+                                                  document.getElementById("error_msg").innerHTML=error;
+                                              }
+                                          }).catch(function(error) {
+                                              document.getElementById("loading_bar").style.display='none';
+                                              document.getElementById("loader").style.display='none';
+                                              document.getElementById("error_msg").style.display='block';
+                                              document.getElementById("error_msg").innerHTML=error;
+                                          });
+
+                                      }else{
+                                        var mediRef=firebase.database().ref("Users/"+aadhar_s+"/Reports/"+hospital_s+"/"+date+"/"+time+"/"+test);
+                                        mediRef.update({
+                                                        URL:url
+                                          },(error)=>{
+                                              if(error){
+                                                  document.getElementById("loading_bar").style.display='none';
+                                                  document.getElementById("loader").style.display='none';
+                                                  document.getElementById("error_msg").style.display='block';
+                                                  document.getElementById("error_msg").innerHTML=error;
+                                              }else{
+                                                alert("Yes");
+                                              }
+                                          }).catch(function(error) {
+                                              document.getElementById("loading_bar").style.display='none';
+                                              document.getElementById("loader").style.display='none';
+                                              document.getElementById("error_msg").style.display='block';
+                                              document.getElementById("error_msg").innerHTML=error;
+                                          });
+                                      }
+
+                                      
+
+                                    });
+                              });
+                        }).catch((error)=>{
+                            document.getElementById("loading_bar").style.display='none';
+                            document.getElementById("loader").style.display='none';
+                            document.getElementById("error_msg").style.display='block';
+                            document.getElementById("error_msg").innerHTML=error;
+                        });   
+              });
+              
+              document.getElementById("loading_bar").style.display='none';
+              document.getElementById("loader").style.display='none';
+              document.getElementById("error_msg").style.display='block';
+              document.getElementById("error_msg").innerHTML="Success";
+              document.getElementById("error_msg").style.color='green';
+              var refer = firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+temp_id);
+              refer.remove();
+
+              var refer1 = firebase.database().ref("Users/"+temp_id);
+              refer1.remove();
+                        
+          }else{
+            document.getElementById("loading_bar").style.display='none';
+            document.getElementById("loader").style.display='none';
+            document.getElementById("error_msg").style.display='block';
+            document.getElementById("error_msg").innerHTML="Success";
+            document.getElementById("error_msg").style.color='green';
+            var ref = firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+temp_id);
+            ref.remove();
+
+            var ref1 = firebase.database().ref("Users/"+temp_id);
+            ref1.remove();
+          }
+        }).catch((error)=>{
+            document.getElementById("loading_bar").style.display='none';
+            document.getElementById("loader").style.display='none';
+            document.getElementById("error_msg").style.display='block';
+            document.getElementById("error_msg").innerHTML=error;
+        });
+      }
+
+        
+    </script>
+   </body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Medipat</title>
+      <link rel="stylesheet" href="medical_hospital.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+
+      
+   </head>
+   <body>
+    <nav>
+         <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+         </div>
+         <div class="logo">
+            Medipat
+         </div>
+         <div class="nav-items">
+            <li><a href="hospital_home.html" >Home</a></li>
+            <li><a href="all_patients_list_hospital.html">Patients</a></li>
+            <li><a href="lab_hospital.html">Lab</a></li>
+            <li><a href="#" style="color: red;">Medical</a></li>
+            <li>
+              <select onchange="moreFun(event)" style="max-width: 50%;background: #171c24;color: #ffffff;font-size: 18px;
+                      font-weight: 500;text-decoration: none;border: none;" >
+                <option><a href="#">More</a></li></option>
+                <option ><li><a>Add patient</a></li></option>
+                <option ><li><a>Add medicine</a></li></option>
+                <option ><li><a>Add lab tests</a></li></option>
+              </select>
+            </li>
+              
+            
+         </div> 
+         <div class="search-icon">
+            <span class="fas fa-search"></span>
+         </div>
+         <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+         </div>
+      </nav>
+
+        <div class="content_form" id="content_form">
+
+           <div class="maindivclass" id="fetching_form" >
+              <div class="maincontainer">
+                <div class="formcontainer">
+                  <center><span id="loading_bar_fetcher">Please wait while we fetching all patient medical details...
+                  </span></center>
+                  <span id="error_fetcher" style="color:red;font-size: 25px;font-weight: bold;"></span>
+
+                  <center><img src="img/loader.svg" alt="Error" id="loader_fetcher" /></center>
+                  <span id="no_internet_span" style="color: red;display: none;">Please Check your internet connectivity...</span>
+                  <button id="refreshbtn" style="background-color: #8ebf42;color: white;padding: 15px 0px;margin: 15px 0px;border: none;cursor: grabbing;font-size: 20px;width: 100%;" >Refresh this page</button></center>
+
+                </div>
+
+              </div>
+          </div>
+
+          <div  id="main_div" class="maindivclass" style="display: none;">
+            <div class="maincontainer">
+              
+              <h1 style="font-size: 25px;color: #022d6e;">Search Patient by Aadhar</h1>
+              <input type="number" id="aadhar_text" name="" placeholder="Enter patient aadhar number"><br/>
+              <center><span id="loading_bar_aadhar" style="display: none;">Please wait while we fetching patient medicine details...</span></center>
+              <center><span id="error_msg_aadhar" style="display: none;color: red;"></span></center>
+              <center><img src="img/loader.svg" alt="Error" id="loader_aadhar" style="display: none;"/></center>
+              <center><button id="search_aadhar_btn">Search</button></center>
+            </div>
+
+          </div>
+        </div>
+         
+
+      <script>
+        function moreFun(x){
+          if(x.target.value=='Add medicine'){
+            window.location.replace('add_medicine_medical.html')
+          }
+          else if(x.target.value=='Add patient'){
+            window.location.replace('add_patient_to_hospital.html')
+          }
+          else if(x.target.value=='Add lab tests'){
+            window.location.replace('add_lab_tests_hospital.html')
+          }
+        }
+
+
+         const menuBtn = document.querySelector(".menu-icon span");
+         const searchBtn = document.querySelector(".search-icon");
+         const cancelBtn = document.querySelector(".cancel-icon");
+         const items = document.querySelector(".nav-items");
+         const form = document.querySelector("form");
+         menuBtn.onclick = ()=>{
+           items.classList.add("active");
+           menuBtn.classList.add("hide");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+         cancelBtn.onclick = ()=>{
+           items.classList.remove("active");
+           menuBtn.classList.remove("hide");
+           searchBtn.classList.remove("hide");
+           cancelBtn.classList.remove("show");
+           form.classList.remove("active");
+           cancelBtn.style.color = "#ff3d00";
+         }
+         searchBtn.onclick = ()=>{
+           form.classList.add("active");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+
+      </script>
+
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+
+              // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+      var hospital_s="",aadhar_s="";
+
+      var user_name_s="";
+      var user_aadhar_s="";
+      var obj_n={};
+
+      var error_msg_fet=document.getElementById("error_fetcher");
+      var loading_bar_fet=document.getElementById("loading_bar_fetcher");
+      var loader_fet=document.getElementById("loader_fetcher");
+
+      window.onload = function() {
+          hospital_s=window.localStorage.getItem("hospital_name");
+          if(navigator.onLine){
+            var aadhar_s='';
+            const dbref=firebase.database().ref();
+            dbref.child("Hospitals").child(hospital_s).child("Medical").once("value",function(snapshotm){
+                if(snapshotm.exists()){
+                  var h1_title=document.createElement("h1");
+                  h1_title.innerHTML="Patient Medicine Details";
+                  h1_title.style.marginBottom='10px';
+                  h1_title.style.color='#037780';
+                  document.getElementsByTagName("body")[0].appendChild(h1_title);
+                  snapshotm.forEach(function(childsnapshot){
+                        aadhar_s=childsnapshot.key;
+                        getPatientDetails(aadhar_s);   
+                  });
+                }else{
+                  error_msg_fet.textContent="No patient found.";
+                  loading_bar_fet.textContent="";
+                  loader_fet.style.display='none';
+                  document.getElementById('fetching_form').style.display='block';
+                  document.getElementById('main_div').style.display='none';
+                }
+                     
+              }).catch((error)=>{
+                  error_msg_fet.textContent=error;
+                  loading_bar_fet.textContent="";
+                  loader_fet.style.display='none';
+                  document.getElementById('fetching_form').style.display='block';
+                  document.getElementById('main_div').style.display='none';
+              });
+            
+              
+          }else{
+            //alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+          }
+          
+      };
+
+      function getPatientDetails(aadhar_s){
+        var user_phone_s='';
+        const dbref=firebase.database().ref();
+        dbref.child("Users").child(aadhar_s).get().then((snapshots)=>{
+          user_phone_s=snapshots.val().Phone;
+            if(user_phone_s==""){
+            {
+                                      var linebreak = document.createElement("br");
+                                      var divmain = document.createElement("div");
+                                      divmain.style.marginBottom='30px';
+                                      divmain.style.marginLeft='50px';
+                                      divmain.style.marginRight='50px';
+                                      
+
+                                      divmain.style.border='5px';
+                                      divmain.style.borderStyle='solid';
+                                      divmain.style.borderColor='#9605a1';
+
+                                    
+                                      var divs1 = document.createElement("div");
+                                      divs1.className='childdiv';
+                                      divs1.style.marginTop='30px';
+                                      divs1.style.marginLeft='30px';
+                                      divs1.style.marginRight='30px';
+                                      divs1.style.marginBottom='40px';
+                                      divs1.style.color='#050505';
+                                      divs1.style.fontFamily='sanserif';
+
+                                      
+                                        var div1 = document.createElement("div");
+                                        div1.style.marginRight='50px';
+                                      
+                                        var aadhar_number=document.createElement("h1");
+                                        aadhar_number.innerHTML=aadhar_s;
+                                        aadhar_number.style.fontSize='26px';
+                                        aadhar_number.style.marginLeft='10px';
+                                        aadhar_number.style.color='#0421b3';
+                                        aadhar_number.style.textAlign='center';
+                                        div1.appendChild(aadhar_number);
+
+
+                                        var name=document.createElement("h1");
+                                        name.innerHTML="Emergency patient";
+                                        name.style.fontSize='26px';
+                                        name.style.marginLeft='10px';
+                                        name.style.color='red';
+                                        name.style.textAlign='center';
+                                        div1.appendChild(name);
+
+                                        var test_label=document.createElement("h2");
+                                        test_label.innerHTML="All Medicines:";
+                                        test_label.style.fontSize='30px';
+                                        test_label.style.marginLeft='10px';
+                                        test_label.style.color='#fc0324';
+                                        div1.appendChild(test_label);
+
+                                        var k=0;
+
+
+                                        dbref.child("Hospitals").child(hospital_s).child("Medical").child(aadhar_s).once("value",function(snapshotm){
+                                            snapshotm.forEach(function(childsnapshot){
+                                              var test_s=childsnapshot.key;
+                                              //var reading_s=childsnapshot.val().Reading_Unit;
+                                              k++;
+                                              var test=document.createElement("h2");
+                                              var val=k+"."+test_s+".";
+                                              val=val.replace("{}",".");
+                                              val=val.replace("[]","#");
+                                              val=val.replace("<>","$");
+                                        
+                                              test.innerHTML=val;
+                                              test.style.fontSize='22px';
+                                              test.style.marginLeft='40px';
+                                              test.style.color='#1a1617';
+                                              div1.appendChild(test);
+
+                                                 
+                                            });
+                                        }).catch((error)=>{
+                                            error_msg_fet.textContent=error;
+                                            loading_bar_fet.textContent="";
+                                            loader_fet.style.display='none';
+                                        });
+                                        
+                                        var button = document.createElement("button");
+                                        button.innerHTML = "Select Patient";
+                                        button.style.color='#1c0270';
+                                        button.style.fontWeight='bold';
+                                        button.style.fontSize='25px';
+                                        button.style.backgroundColor='yellow';
+                                        button.style.width='23%';
+                                        button.style.paddingTop='20px';
+                                        button.style.paddingBottom='20px';
+                                        button.style.float='right';
+                                        button.addEventListener('click',function(){
+                                            window.localStorage.setItem('patient_aadhar',aadhar_s);
+                                            window.localStorage.setItem('patient_name_lab',"");
+                                            window.location.replace('submit_medicine_patient_medical.html')
+                                        });
+                                        div1.appendChild(button);
+                                      
+                                        divs1.appendChild(div1);
+                                    
+                                            
+                                        divmain.appendChild(divs1);
+                                    
+                                        divmain.appendChild(linebreak);
+        
+                                        document.getElementsByTagName("body")[0].appendChild(divmain);
+                        }
+            }
+            else{
+          dbref.child("Users").child(aadhar_s).child("Personal_Info").get().then((snapshot)=>{
+                
+                var user_name_s=' ';
+                user_name_s=snapshot.val().Name+" "+snapshot.val().Father_Name;
+                obj_n[aadhar_s]=user_name_s;
+
+                        {
+                                      var linebreak = document.createElement("br");
+                                      var divmain = document.createElement("div");
+                                      divmain.style.marginBottom='30px';
+                                      divmain.style.marginLeft='50px';
+                                      divmain.style.marginRight='50px';
+                                      
+
+                                      divmain.style.border='5px';
+                                      divmain.style.borderStyle='solid';
+                                      divmain.style.borderColor='#9605a1';
+
+                                    
+                                      var divs1 = document.createElement("div");
+                                      divs1.className='childdiv';
+                                      divs1.style.marginTop='30px';
+                                      divs1.style.marginLeft='30px';
+                                      divs1.style.marginRight='30px';
+                                      divs1.style.marginBottom='40px';
+                                      divs1.style.color='#050505';
+                                      divs1.style.fontFamily='sanserif';
+
+                                      
+                                        var div1 = document.createElement("div");
+                                        div1.style.marginRight='50px';
+                                      
+                                        var aadhar_number=document.createElement("h1");
+                                        aadhar_number.innerHTML=aadhar_s;
+                                        aadhar_number.style.fontSize='26px';
+                                        aadhar_number.style.marginLeft='10px';
+                                        aadhar_number.style.color='#0421b3';
+                                        aadhar_number.style.textAlign='center';
+                                        div1.appendChild(aadhar_number);
+
+
+                                        var name=document.createElement("h1");
+                                        name.innerHTML=user_name_s;
+                                        name.style.fontSize='26px';
+                                        name.style.marginLeft='10px';
+                                        name.style.color='green';
+                                        name.style.textAlign='center';
+                                        div1.appendChild(name);
+
+                                        var test_label=document.createElement("h2");
+                                        test_label.innerHTML="All Medicines:";
+                                        test_label.style.fontSize='30px';
+                                        test_label.style.marginLeft='10px';
+                                        test_label.style.color='#fc0324';
+                                        div1.appendChild(test_label);
+
+                                        var k=0;
+
+
+                                        dbref.child("Hospitals").child(hospital_s).child("Medical").child(aadhar_s).once("value",function(snapshotm){
+                                            snapshotm.forEach(function(childsnapshot){
+                                              var test_s=childsnapshot.key;
+                                              //var reading_s=childsnapshot.val().Reading_Unit;
+                                              k++;
+                                              var test=document.createElement("h2");
+                                              var val=k+"."+test_s+".";
+                                              val=val.replace("{}",".");
+                                              val=val.replace("[]","#");
+                                              val=val.replace("<>","$");
+                                        
+                                              test.innerHTML=val;
+                                              test.style.fontSize='22px';
+                                              test.style.marginLeft='40px';
+                                              test.style.color='#1a1617';
+                                              div1.appendChild(test);
+
+                                                 
+                                            });
+                                        }).catch((error)=>{
+                                            error_msg_fet.textContent=error;
+                                            loading_bar_fet.textContent="";
+                                            loader_fet.style.display='none';
+                                        });
+                                        
+                                        var button = document.createElement("button");
+                                        button.innerHTML = "Select Patient";
+                                        button.style.color='#1c0270';
+                                        button.style.fontWeight='bold';
+                                        button.style.fontSize='25px';
+                                        button.style.backgroundColor='yellow';
+                                        button.style.width='23%';
+                                        button.style.paddingTop='20px';
+                                        button.style.paddingBottom='20px';
+                                        button.style.float='right';
+                                        button.addEventListener('click',function(){
+                                            window.localStorage.setItem('patient_aadhar',aadhar_s);
+                                            window.localStorage.setItem('patient_name_lab',user_name_s);
+                                            window.location.replace('submit_medicine_patient_medical.html')
+                                        });
+                                        div1.appendChild(button);
+                                      
+                                        divs1.appendChild(div1);
+                                    
+                                            
+                                        divmain.appendChild(divs1);
+                                    
+                                        divmain.appendChild(linebreak);
+        
+                                        document.getElementsByTagName("body")[0].appendChild(divmain);
+                        }
+                                
+            }).catch((error)=>{
+                error_msg_fet.textContent=error;
+                loading_bar_fet.textContent="";
+                loader_fet.style.display='none';
+
+            });
+              
+          }
+          document.getElementById('main_div').style.display='block';
+          document.getElementById('fetching_form').style.display='none';
+        });
+
+            
+      }
+
+      function SearchByAadhar(){
+        var aadharin=document.getElementById("aadhar_text").value;
+        var loading_bar_aadhar=document.getElementById("loading_bar_aadhar");
+        var loader_aadhar=document.getElementById("loader_aadhar");
+        var error_msg_aadhar=document.getElementById("error_msg_aadhar");
+
+        if(aadharin.length!=12){
+          error_msg_aadhar.textContent="Aadhar number length must me 12."
+          error_msg_aadhar.style.display='block';
+          loading_bar_aadhar.style.display='none';
+          loader_aadhar.style.display='none';
+        }else{
+          console.log(obj_n[aadharin]);
+          if(obj_n[aadharin]==null){
+            error_msg_aadhar.textContent="This user is not your patient (or) Please check aadhar number."
+            error_msg_aadhar.style.display='block';
+            loading_bar_aadhar.style.display='none';
+            loader_aadhar.style.display='none';
+          }else{
+            error_msg_aadhar.textContent=""
+            error_msg_aadhar.style.display='block';
+            loading_bar_aadhar.style.display='block';
+            loader_aadhar.style.display='block';
+              const dbref=firebase.database().ref();
+              dbref.child("Hospitals").child(hospital_s).child("Medical").child(aadharin).once("value",function(snapshot){
+                if(snapshot.exists()){
+                    window.localStorage.setItem('patient_aadhar',aadharin);
+                    window.localStorage.setItem('patient_name_lab',obj_n[aadharin]);
+                    window.location.replace('submit_medicine_patient_medical.html')
+                }else{
+                  error_msg_aadhar.innerHTML="No medicine found for this patient.";
+                  loading_bar_aadhar.style.display='none';
+                  loader_aadhar.style.display='none';
+                }
+
+              }).catch((error)=>{
+                  error_msg_aadhar.innerHTML='';
+                  loading_bar_aadhar.style.display='none';
+                  loader_aadhar.style.display='none';
+              });
+          }
+
+          
+        }
+
+      }
+      document.getElementById("search_aadhar_btn").addEventListener('click',SearchByAadhar);
+
+
+      function RefreshBtn(){
+        window.location.reload(true);
+      }
+      document.getElementById("refreshbtn").addEventListener('click',RefreshBtn);
+        
+    </script>
+   </body>
+</html>

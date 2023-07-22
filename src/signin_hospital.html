@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SignIn to Hospital</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+    <href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="signin_hospital.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+  </head>
+  <body>
+
+    <div class="maindivclass" id="fetching_form">
+      <div class="maincontainer">
+        <button id="back_btn" style="background-color: #d6ab04;color: white;margin-top: 5px;margin-left: 10px;border: none;cursor: grabbing;width: 9%;font-size: 20px;"> << Back</button>
+        <h1>SignIn to Hospital</h1>
+        <div class="formcontainer">
+          <center><span id="loading_bar_fetcher"></span></center>
+          <span id="error_fetcher" style="color:red;"></span>
+
+          <center><img src="img/loader.svg" alt="Error" id="loader_fetcher" style="display: none;" /></center>
+          <span id="no_internet_span" style="color: red;display: none;">Please Check your internet connectivity...</span>
+          <button id="refreshbtn" >Refresh this page</button></center>
+
+        </div>
+
+      </div>
+    </div>
+
+    <div class="maindivclass" id="main_form" style="display: none;">
+      
+          <div class="maincontainer" id="phone_number_container" >
+            <h1>SignIn to Hospital</h1>
+            <div class="imgcontainer">
+              <center> <img src="https://firebasestorage.googleapis.com/v0/b/patient-info-monitoring.appspot.com/o/Logo.jpg?alt=media&token=fd5e6ceb-667f-4d4f-96ec-06211e671cd6" 
+                       alt="Check Internet" class="avatar" width="120px" height="120px">
+              </center>
+          </div>
+            <div class="formcontainer">
+                  <div class="container">
+                      <label ><strong>Hospital Name:</strong></label><br/><br/>
+                        <span><b>Filter your hospital</b></span>
+                          <input type="text" placeholder="Enter your hospital hint" id="hospital_filter"  onkeyup="Filter()" required>
+                      
+                        <select id="Hospitals">
+                          <option value="" selected>Select your hospital</option>
+                          
+                        </select>
+
+                      </label><br/>
+
+                      <label><b>Password</b>
+
+              <input type="password" placeholder="Enter your hospital password" id="password" required>
+              </label><br/>
+
+              <input type="checkbox" id="show_password_cb"> <label id="label_password" style="font-size: 17px;">Show Password </label><br/><br/>
+
+              <span id="error_msg" style="color:red;"></span>
+
+              <p id="loading_bar_signin"></p>
+              <center><img src="img/loader.svg" alt="Error" id="loader_signin" style="display: none" /></center>
+
+                  </div>
+                  <button type="button" id="signinbtn">SignIn</button>
+                  <div class="container" style="background-color:#f1f1f1">
+                    <span>New to this website?</span>
+                        <button type="button" class="signupbtn_cl" id="signupbtn">SignUp</button>
+                  </div>
+            </div> 
+          </div>
+    </div>
+
+    <script type="text/javascript">
+          function Filter(){
+            var keyword=document.getElementById("hospital_filter").value.toLowerCase();
+            var sel=document.getElementById("Hospitals");
+            for(var i=0;i<sel.length;i++){
+              var txt=sel.options[i].text.toLowerCase();
+              if(!txt.match(keyword)){
+                $(sel.options[i]).attr('disabled','disabled').hide();
+              }else{
+                $(sel.options[i]).removeAttr('disabled').show();
+              }
+            }
+          }
+      </script>
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+      import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+
+              
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+     firebase.analytics();
+
+     // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db=getDatabase();
+
+    var fetcher_form=document.getElementById("fetching_form");
+    var main_form=document.getElementById("main_form")
+
+    window.onload=function(){
+        if(navigator.onLine){
+          var error_msg_fet=document.getElementById("error_fetcher");
+          var loading_bar_fet=document.getElementById("loading_bar_fetcher");
+          var loader_fet=document.getElementById("loader_fetcher");
+          var refreshbtn=document.getElementById("refreshbtn");
+          main_form.style.display='none';
+          loader_fet.style.display='block';
+
+          error_msg_fet.textContent="";
+          loading_bar_fet.textContent="Please wait while we fetching database details...";
+          const dbref=firebase.database().ref();
+              dbref.child("Hospitals").once("value",function(snapshot){
+                      snapshot.forEach(function(childsnapshot){
+                        var value=childsnapshot.key;
+                        var hos_sel=document.getElementById("Hospitals");
+                        var opt=document.createElement('option');
+                        opt.value=value;
+                        opt.innerHTML=value;
+                        hos_sel.appendChild(opt); 
+                        loader_fet.style.display='none';
+                        main_form.style.display='block';
+                        fetching_form.style.display='none';
+                      });
+              }).catch((error)=>{
+                  error_msg_fet.textContent=error;
+                  loading_bar_fet.textContent="";
+                  loader_fet.style.display='none';
+
+              });
+        }else{
+            document.getElementById("no_internet_span").style.display="block";
+            alert("Oops! You're offline. Please check your network connection...")          
+        } 
+    };
+    function RefreshBtn(){
+        window.location.reload(true);
+    }
+    refreshbtn.addEventListener('click',RefreshBtn);
+
+
+      var coderesult="";
+      var error_msg_p=document.getElementById('error_msg');
+      var loading_bar=document.getElementById('loading_bar_signin');
+      var signin_btn=document.getElementById('signinbtn');
+      var signup_btn=document.getElementById('signupbtn');
+      var loader_signin=document.getElementById('loader_signin');
+
+      var hospital_s="";
+      var pass_s="";
+
+      function SignIn() {
+        if(navigator.onLine){
+              hospital_s=document.getElementById("Hospitals").value;
+              pass_s = document.getElementById('password').value;
+              if(hospital_s.length<=1){
+                error_msg_p.textContent="Please select your hospital name."
+              }
+              else if(pass_s.length<6){
+                error_msg_p.textContent="Please enter valid password. Password length must be 6 letter least."
+              }else{
+                error_msg_p.textContent="";
+                loading_bar.textContent="Please wait...";
+                loader_signin.style.display='block';
+
+                const dbref=firebase.database().ref();
+                var phone_number_db="";
+                dbref.child("Hospitals").child(hospital_s).once("value",function(snapshot){
+                    if(snapshot.exists()){
+                        var password_db=snapshot.val().Password;
+                        if(password_db==pass_s){
+                            window.localStorage.setItem('hospital_name',hospital_s);
+                            window.location.replace('hospital_home.html')
+                            loader_signin.style.display='none';
+                            error_msg_p.textContent="";
+                            loading_bar.textContent="";
+                        }else{
+                            error_msg_p.textContent="Your password is incorrect.";
+                            loading_bar.textContent="";
+                            loader_signin.style.display='none';
+                        }
+                    }else{
+                        error_msg_p.textContent="You are not user. Please create account for your hospital";
+                        loading_bar.textContent="";
+                        loader_signin.style.display='none';
+                    }
+                }).catch((error)=>{
+                    error_msg_p.textContent=error;
+                    loading_bar.textContent="";
+                    loader_signin.style.display='none';
+                });
+              }
+          }else{
+            alert("Oops! You're offline. Please check your network connection...")
+          }
+          
+      }
+
+      signin_btn.addEventListener('click',SignIn);
+
+      function SignUp(){
+        window.location.replace('signup_hospital.html')
+      }
+
+      signup_btn.addEventListener('click',SignUp);
+
+        function ShowPassword(){
+          var pass_edt=document.getElementById("password");
+
+          var label_pass=document.getElementById("label_password");
+          if(pass_edt.type==="password"){
+            pass_edt.type="text";
+            label_pass.innerHTML="Hide Password";
+          }else{
+            pass_edt.type="password";
+            label_pass.innerHTML="Show Password";
+          }
+        }
+
+        document.getElementById("show_password_cb").addEventListener('click',ShowPassword);
+
+        function Back(){
+            window.location.replace("index.html")
+        }
+        document.getElementById("back_btn").addEventListener('click',Back);
+
+</script>
+    
+  </body>
+</html>

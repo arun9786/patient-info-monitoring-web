@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Medipat</title>
+      <link rel="stylesheet" href="add_lab_report_patient_lab.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+
+      
+   </head>
+   <body>
+    <nav>
+         <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+         </div>
+         <div class="logo">
+            Medipat
+         </div>
+         <div class="nav-items">
+            <li><a href="hospital_home.html">Home</a></li>
+            <li><a href="all_patients_list_hospital.html">Patients</a></li>
+            <li><a href="lab_hospital.html" style="color: red;">Lab</a></li>
+            <li><a href="medical_hospital.html">Medical</a></li>
+            <li>
+              <select onchange="moreFun(event)" style="max-width: 50%;background: #171c24;color: #ffffff;font-size: 18px;
+                      font-weight: 500;text-decoration: none;border: none;" >
+                <option><a href="#">More</a></li></option>
+                <option ><li><a>Add patient</a></li></option>
+                <option ><li><a>Add medicine</a></li></option>
+                <option ><li><a>Add lab tests</a></li></option>
+              </select>
+            </li>
+              
+            
+         </div> 
+         <div class="search-icon">
+            <span class="fas fa-search"></span>
+         </div>
+         <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+         </div>
+      </nav>
+
+        <div class="content_form" id="content_form">
+
+           <div class="maindivclass" id="fetching_form">
+              <div class="maincontainer">
+                <h1>Add Lab Report</h1>
+                <div class="formcontainer">
+                  <center><span id="loading_bar_fetcher">Just a moment...
+                  </span></center>
+                  <span id="error_fetcher" style="color:red;"></span>
+
+                  <center><img src="img/loader.svg" alt="Error" id="loader_fetcher" /></center>
+                  <span id="no_internet_span" style="color: red;display: none;">Please Check your internet connectivity...</span>
+                  <button id="refreshbtn" >Refresh this page</button></center>
+
+                </div>
+
+              </div>
+          </div>
+
+          <div  id="main_div" class="maindivclass" style="display: none;">
+            <div class="maincontainer">
+              <h1>Patient Lab Tests</h1>
+            </div>
+
+            <div class="maincontainer" style="margin-top: 20px;">
+            </div>
+
+            <div class="maincontainer">
+              <p id="object_para"></p>
+              <h1 id="user_name" style="color: blue;margin-top: 20px;"></h1>
+              <h1 id="user_aadhar" style="color: #479903;"></h1>
+
+              <h2 style="color: #f70529;margin-left: 20px";>Needed Tests:</h2>
+              <h3 style="color: #b58910;margin-left: 60px;font-size: 25px;" id="no_test_fonund_text">No Test Found</h3>
+              <div id="add_div_container">
+              </div>
+
+              <div id="select_div" style="display: none;">
+                <span style="color: #f7bf05;margin-left: 20px;">Select test:</span><br/>
+                <select id="test_select" >
+                  <option value="">Select test</option>
+                </select>
+              </div>
+
+              <div class="reading_div" id="reading_div" style="display: none;">
+
+                <center>
+                  <input type="text" placeholder="Reading..." id="reading_input" style="width: 20%;" />
+                  <span id="reading_unit_span" style="color: blue;"></span><br/>
+                  <span id="error_reading_unit_span" style="color: red;"></span><br/>
+                  <p id="wait_upload_reading" style="display: none;font-size: 20px;">Please wait...</p>
+                  <center><img src="img/loader.svg" alt="Error" id="upload_reading_fetcher" style="display: none;" /></center><br/>
+                  <button id="save_reading_btn" style="width: 60%;">Save</button>
+                </center>
+                
+              </div>
+
+              <div class="report_div" id="report_div" style="display: none;">
+                <input type="file" id="files">
+                <center>
+                  <span id="span_upload_image" style="color: red;"></span>
+                  <p id="wait_upload" style="display: none;font-size: 20px;">Please wait...</p>
+                  <center><img src="img/loader.svg" alt="Error" id="upload_fetcher" style="display: none;" /></center><br/>
+                  <button id="upload_image" style="width: 60%;">Upload</button>
+                <center>
+
+              </div>
+
+
+            </div>
+
+          </div>
+        </div>
+
+      <script>
+        function moreFun(x){
+          if(x.target.value=='Add medicine'){
+            window.location.replace('add_medicine_medical.html')
+          }
+          else if(x.target.value=='Add patient'){
+            window.location.replace('add_patient_to_hospital.html')
+          }
+          else if(x.target.value=='Add lab tests'){
+            window.location.replace('add_lab_tests_hospital.html')
+          }        }
+
+         const menuBtn = document.querySelector(".menu-icon span");
+         const searchBtn = document.querySelector(".search-icon");
+         const cancelBtn = document.querySelector(".cancel-icon");
+         const items = document.querySelector(".nav-items");
+         const form = document.querySelector("form");
+         menuBtn.onclick = ()=>{
+           items.classList.add("active");
+           menuBtn.classList.add("hide");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+         cancelBtn.onclick = ()=>{
+           items.classList.remove("active");
+           menuBtn.classList.remove("hide");
+           searchBtn.classList.remove("hide");
+           cancelBtn.classList.remove("show");
+           form.classList.remove("active");
+           cancelBtn.style.color = "#ff3d00";
+         }
+         searchBtn.onclick = ()=>{
+           form.classList.add("active");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+
+      </script>
+
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+
+              // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+      var hospital_s="",aadhar_s="",user_name_set;
+
+      var error_msg_fet=document.getElementById("error_fetcher");
+      var loading_bar_fet=document.getElementById("loading_bar_fetcher");
+      var loader_fet=document.getElementById("loader_fetcher");
+
+      var obj_r={};
+
+      window.onload = function() {
+          hospital_s=window.localStorage.getItem("hospital_name");
+          aadhar_s=window.localStorage.getItem("patient_aadhar");
+          user_name_set=window.localStorage.getItem("patient_name_lab");
+          if(navigator.onLine){
+            getPatientTestDetails(aadhar_s);
+          }else{
+            //alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+          }
+          
+      };
+
+      $('#test_select').change(function(){ 
+        var value = $(this).val();
+        if(value==''){
+          document.getElementById("reading_div").style.display='none';
+          document.getElementById("report_div").style.display='none';
+        }
+        else{
+          document.getElementById("reading_unit_span").innerHTML=obj_r[value];
+            if(obj_r[value]==''){
+              document.getElementById("reading_div").style.display='none';
+              document.getElementById("report_div").style.display='block';
+            }else{
+              document.getElementById("reading_div").style.display='block';
+              document.getElementById("report_div").style.display='none';
+            }
+          }
+        
+      });
+
+      function getPatientTestDetails(aadhar_s){
+        var user_phone_s='';
+        const dbref=firebase.database().ref();
+        var hos_sel=document.getElementById("test_select");
+
+                        {
+                                      var linebreak = document.createElement("br");
+                                      
+                                      var divs1 = document.getElementById("add_div_container");
+                                      divs1.className='childdiv';
+                                      divs1.style.marginTop='10px';
+                                      divs1.style.marginLeft='50px';
+                                      divs1.style.marginRight='30px';
+                                      divs1.style.marginBottom='10px';
+                                      divs1.style.color='#050505';
+                                      divs1.style.fontFamily='sanserif';
+
+                                      
+                                        var div1 = document.createElement("div");
+                                        div1.style.marginRight='50px';
+                                        
+                                        document.getElementById("user_name").innerHTML=user_name_set;
+                                        document.getElementById("user_aadhar").innerHTML=aadhar_s;
+
+                                        var k=0;
+
+                                        dbref.child("Hospitals").child(hospital_s).child("Reports").child(aadhar_s).once("value",function(snapshotm){
+                                            snapshotm.forEach(function(childsnapshot){
+                                              var test_s=childsnapshot.key;
+
+                                              k++;
+                                              var test=document.createElement("h2");
+                                              var val=k+"."+test_s+".";
+                                              var reading_s=childsnapshot.val().Reading_Unit;
+                                              obj_r[test_s]=reading_s;
+                                              if(reading_s!=''){
+                                                val=k+"."+test_s+"("+reading_s+")."
+                                              }else{
+                                                val=k+"."+test_s+"(Report).";
+                                              }
+                                              test.innerHTML=val;
+                                              test.style.fontSize='22px';
+                                              test.style.marginLeft='40px';
+                                              test.style.color='#f705cf';
+                                              div1.appendChild(test);
+
+                                              var opt=document.createElement('option');
+                                              opt.value=test_s;
+                                              opt.innerHTML=test_s;
+                                              hos_sel.appendChild(opt);
+
+                                              document.getElementById("no_test_fonund_text").style.display='none';
+                                              document.getElementById("select_div").style.display='block';
+                                            });
+                                            document.getElementById('main_div').style.display='block';
+                                            document.getElementById('fetching_form').style.display='none';
+                                        }).catch((error)=>{
+                                            error_msg_fet.textContent=error;
+                                            loading_bar_fet.textContent="";
+                                            loader_fet.style.display='none';
+                                        });   
+
+                                        divs1.appendChild(div1);                                    
+                                       
+                        }
+      }
+
+
+      function UploadReading(){
+
+        var value=document.getElementById("reading_input").value;
+        document.getElementById("error_reading_unit_span").innerHTML="";
+        if(value==''){
+          document.getElementById("error_reading_unit_span").innerHTML="Please add reading";
+          document.getElementById("upload_reading_fetcher").style.display='none';
+          document.getElementById("wait_upload_reading").style.display='none';
+
+        }else{
+          var unit=document.getElementById("reading_unit_span").textContent;
+          document.getElementById("error_reading_unit_span").innerHTML="";
+          document.getElementById("upload_reading_fetcher").style.display='block';
+          document.getElementById("wait_upload_reading").style.display='block';
+
+          var test_name=document.getElementById("test_select").value;
+          var date=new Date();
+          var today=date.getDate()+":"+(date.getMonth()+1)+":"+date.getFullYear();
+          var time=date.getHours()+":"+date.getMinutes();
+          var userRef=firebase.database().ref("Users/"+aadhar_s+"/Reports/"+hospital_s+"/"+
+              today+"/"+time+"/"+test_name);
+            userRef.update({
+                            Reading_Value:value,
+                            Reading_Unit:unit
+              },(error)=>{
+                if(error){
+                  document.getElementById("error_reading_unit_span").innerHTML=error;
+                  document.getElementById("upload_reading_fetcher").style.display='none';
+                  document.getElementById("wait_upload_reading").style.display='none';
+                }else{
+                  var hosRef=firebase.database().ref("Hospitals/"+hospital_s+"/"+"Patients/"+aadhar_s+"/Reports/"+today+"/"+time+"/"+test_name);
+                  hosRef.update({
+                        Reading_Value:value,
+                        Reading_Unit:unit
+                  },(error)=>{
+                    if(error){
+                      document.getElementById("error_reading_unit_span").innerHTML=error;
+                      document.getElementById("upload_reading_fetcher").style.display='none';
+                      document.getElementById("wait_upload_reading").style.display='none';
+                      }else{
+                          var ref = firebase.database().ref("Hospitals/"+hospital_s+"/Reports/"+aadhar_s+"/"+test_name);
+                          ref.remove();
+                          Visited_date_update();
+                            alert("Successfully Added");
+                            window.location.reload(true);
+                      }
+                  }).catch(function(error_fetcher){
+                    document.getElementById("error_reading_unit_span").innerHTML=error;
+                    document.getElementById("upload_reading_fetcher").style.display='none';
+                    document.getElementById("wait_upload_reading").style.display='none';
+              });           
+              }
+            }).catch(function(error) {
+              document.getElementById("error_reading_unit_span").innerHTML=error;
+              document.getElementById("upload_reading_fetcher").style.display='none';
+              document.getElementById("wait_upload_reading").style.display='none';              
+          });
+        }
+
+      }
+
+      document.getElementById("save_reading_btn").addEventListener('click',UploadReading);
+
+
+      function UploadFile(){
+        const ref=firebase.storage().ref();
+        const file=document.querySelector("#files").files[0];
+        document.getElementById("span_upload_image").innerHTML="";
+        if(file==undefined){
+          document.getElementById("span_upload_image").innerHTML="Please add report";
+          document.getElementById("upload_fetcher").style.display='none';
+          document.getElementById("wait_upload").style.display='none';
+        }else{
+          document.getElementById("span_upload_image").innerHTML="";
+          document.getElementById("upload_fetcher").style.display='block';
+          document.getElementById("wait_upload").style.display='block';
+          const name=new Date()+"-"+file.name;
+          const metadata={
+            contentType:file.type
+          };
+
+          const task=ref.child(hospital_s).child(name).put(file,metadata);
+
+          task.then(snapshot=>snapshot.ref.getDownloadURL())
+              .then(url=>{
+            var date=new Date();
+            var today=date.getDate()+":"+(date.getMonth()+1)+":"+date.getFullYear();
+            var time=date.getHours()+":"+date.getMinutes();
+            var test_name=document.getElementById("test_select").value;
+            var userRef=firebase.database().ref("Users/"+aadhar_s+"/Reports/"+hospital_s+"/"+
+              today+"/"+time+"/"+test_name);
+            userRef.update({
+                            URL:url
+              },(error)=>{
+                if(error){
+                  document.getElementById("span_upload_image").innerHTML=error;
+                  document.getElementById("upload_fetcher").style.display='none';
+                  document.getElementById("wait_upload").style.display='none';
+                }else{
+                  var hosRef=firebase.database().ref("Hospitals/"+hospital_s+"/"+"Patients/"+aadhar_s+"/Reports/"+today+"/"+time+"/"+test_name);
+                  hosRef.update({
+                        URL:url 
+                  },(error)=>{
+                    if(error){
+                      document.getElementById("span_upload_image").innerHTML=error;
+                      document.getElementById("upload_fetcher").style.display='none';
+                      document.getElementById("wait_upload").style.display='none';
+                      }else{
+                        var ref = firebase.database().ref("Hospitals/"+hospital_s+"/Reports/"+aadhar_s+"/"+test_name);
+                        ref.remove();
+                            Visited_date_update();
+                            alert("Successfully uploaded");
+                            document.getElementById("span_upload_image").innerHTML="Uploaded Successfully";
+                            document.getElementById("upload_fetcher").style.display='none';
+                            document.getElementById("wait_upload").style.display='none';
+                            window.location.reload(true);
+                      }
+                  }).catch(function(error_fetcher){
+                    document.getElementById("span_upload_image").innerHTML=error_fetcher;
+                    document.getElementById("upload_fetcher").style.display='none';
+                    document.getElementById("wait_upload").style.display='none';
+              });           
+          }
+            }).catch(function(error) {
+              document.getElementById("span_upload_image").innerHTML=error;
+              document.getElementById("upload_fetcher").style.display='none';
+              document.getElementById("wait_upload").style.display='none';              
+            });
+          }).catch((error)=>{
+            document.getElementById("span_upload_image").innerHTML=error;
+            document.getElementById("upload_fetcher").style.display='none';
+            document.getElementById("wait_upload").style.display='none';
+          });
+        } 
+      }
+      document.getElementById("upload_image").addEventListener('click',UploadFile);
+
+      function Visited_date_update(){
+        var date=new Date();
+        var today=date.getDate()+":"+(date.getMonth()+1)+":"+date.getFullYear();
+        var dbRef=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+aadhar_s);
+        dbRef.update({
+               Last_Visited:today
+        },(error)=>{
+            if(error){
+                document.getElementById("error_reading_unit_span").innerHTML=error;
+                document.getElementById("upload_reading_fetcher").style.display='none';
+                document.getElementById("wait_upload_reading").style.display='none';
+            }else{
+                var Refe=firebase.database().ref("Users/"+aadhar_s+"/Hospitals/"+hospital_s);
+                Refe.update({
+                      Last_Visited:today
+            },(error)=>{
+                if(error){
+                    document.getElementById("error_reading_unit_span").innerHTML=error;
+                    document.getElementById("upload_reading_fetcher").style.display='none';
+                    document.getElementById("wait_upload_reading").style.display='none';
+                }
+            }).catch(function(error_fetcher){
+                document.getElementById("error_reading_unit_span").innerHTML=error;
+                document.getElementById("upload_reading_fetcher").style.display='none';
+                document.getElementById("wait_upload_reading").style.display='none';
+            });
+           }
+          }).catch(function(error_fetcher){
+              document.getElementById("error_reading_unit_span").innerHTML=error;
+              document.getElementById("upload_reading_fetcher").style.display='none';
+              document.getElementById("wait_upload_reading").style.display='none';
+        });
+      }
+
+      function RefreshBtn(){
+        window.location.reload(true);
+      }
+      document.getElementById("refreshbtn").addEventListener('click',RefreshBtn);
+        
+    </script>
+   </body>
+</html>

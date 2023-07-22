@@ -1,0 +1,134 @@
+<html>
+  <head>
+    <title>Search Patient</title>
+    <link rel="stylesheet" type="text/css" href="search_patient.css">
+
+  </head>
+
+        <div class="maincontainer">
+          <center><h1>Search Patient</h1></center>
+          <div class="imgcontainer">
+              <center> <img src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20190710102234/download3.png" 
+                   alt="Avatar" class="avatar">
+              </center>
+          </div>
+    
+          <div class="container">
+
+              <label><b>Aadhar No</b>
+              <input type="number" placeholder="Search Aadhar No" id="aadhar_no" required>
+              </label>
+              <span class="error_msg" id="error_msg_span" style="color: red;font-size: 20px;"></span>
+
+              <div class="loading">
+                  <p id="loadingbar_home" ></p>
+              </div>
+
+              <center><img src="img/loader.svg" alt="Error" id="loader_home" style="display: none" /></center>
+    
+              <button id="searchbtn">Search</button>
+              
+          </div>
+    
+          <div class="container" style="background-color:#f1f1f1">
+              <button type="button" class="addpatientbtn_cl" id="addpatient_btn">Add Patient</button>
+              <span class="psw">New User? <a href="#" id="create_new_account_btn">Create New Account</a></span>
+          </div>
+        </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+
+              // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+
+      // window.onload = function() {
+      //     if(navigator.onLine){
+      //     }else{
+      //         alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+      //     }
+      // };
+
+
+        var search_btn=document.getElementById('searchbtn');
+        var addpatient_btn=document.getElementById('addpatient_btn');
+        var create_new_account_btn=document.getElementById('create_new_account_btn');
+        var error_msg_span=document.getElementById('error_msg_span');
+        var loading_bar=document.getElementById('loadingbar_home');
+        var loader_home=document.getElementById('loader_home');
+
+        function SearchUser(){
+          if(navigator.onLine){
+            var aadhar_s=document.getElementById('aadhar_no').value;
+            var hospital_s="KMA";
+            
+            if(aadhar_s.length!=12){
+              error_msg_span.textContent="Please enter a valid aadhar number. Length must be 12."
+              loading_bar.textContent="";
+            }else{
+              const dbref=firebase.database().ref();
+              error_msg_span.textContent="";
+              loading_bar.textContent="Please wait while we fetching this user info.";
+              loader_home.style.display='block';
+              document.getElementById("searchbtn").disabled=true;
+              dbref.child("Hospitals").child(hospital_s).child(aadhar_s).get().then((snapshot)=>{
+                  if(snapshot.exists()){
+                      var pass_db=snapshot.val().Password;
+                      document.getElementById("searchbtn").disabled=false;
+                      loader_home.style.display='none';
+                      alert("Successfully verified.")
+                      error_msg_span.textContent="";
+                      loading_bar.textContent="";
+                  }else{
+                      document.getElementById("searchbtn").disabled=false;
+                      error_msg_span.textContent="Please enter a valid aadhar number (Or) User not your patient. Please add this patient to your hospital patient list.";
+                      loading_bar.textContent="";
+                      loader_home.style.display='none';
+                  }
+              }).catch((error)=>{
+                  document.getElementById("searchbtn").disabled=false;
+                  error_msg_span.textContent=error;
+                  loading_bar.textContent="";
+                  loader_home.style.display='none';
+
+              });
+            }
+          }else{
+            alert("Oops! You're offline. Please check your network connection...")
+          }
+        }
+
+        function GoAddPatientPage(){
+          window.location.replace('forgotpassword.html')
+        }
+
+        function GoSignUpPage(){
+          window.location.replace('signup.html')
+        }
+        
+
+        search_btn.addEventListener('click',SearchUser);
+        addpatient_btn.addEventListener('click',GoAddPatientPage);
+        create_new_account_btn.addEventListener('click',GoSignUpPage);
+    </script>
+  </body>
+</html>

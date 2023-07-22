@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Medipat</title>
+      <link rel="stylesheet" href="submit_medicine_patient_medical.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+
+      
+   </head>
+   <body>
+    <nav>
+         <div class="menu-icon">
+            <span class="fas fa-bars"></span>
+         </div>
+         <div class="logo">
+            Medipat
+         </div>
+         <div class="nav-items">
+            <li><a href="hospital_home.html">Home</a></li>
+            <li><a href="all_patients_list_hospital.html">Patients</a></li>
+            <li><a href="lab_hospital.html">Lab</a></li>
+            <li><a href="medical_hospital.html" style="color: red;">Medical</a></li>
+            <li>
+              <select onchange="moreFun(event)" style="max-width: 50%;background: #171c24;color: #ffffff;font-size: 18px;
+                      font-weight: 500;text-decoration: none;border: none;" >
+                <option><a href="#">More</a></li></option>
+                <option ><li><a>Add patient</a></li></option>
+                <option ><li><a>Add medicine</a></li></option>
+                <option ><li><a>Add lab tests</a></li></option>
+              </select>
+            </li>
+              
+            
+         </div> 
+         <div class="search-icon">
+            <span class="fas fa-search"></span>
+         </div>
+         <div class="cancel-icon">
+            <span class="fas fa-times"></span>
+         </div>
+      </nav>
+
+        <div class="content_form" id="content_form">
+
+           <div class="maindivclass" id="fetching_form" >
+              <div class="maincontainer">
+                <div class="formcontainer">
+                  <center><span id="loading_bar_fetcher">Please wait while we fetching all patient medical details...
+                  </span></center>
+                  <span id="error_fetcher" style="color:red;font-size: 25px;font-weight: bold;"></span>
+
+                  <center><img src="img/loader.svg" alt="Error" id="loader_fetcher" /></center>
+                  <span id="no_internet_span" style="color: red;display: none;">Please Check your internet connectivity...</span>
+                  <button id="refreshbtn" style="background-color: #8ebf42;color: white;padding: 15px 0px;margin: 15px 0px;border: none;cursor: grabbing;font-size: 20px;width: 100%;" >Refresh this page</button></center>
+
+                </div>
+
+              </div>
+          </div>
+
+          <div class="maindivclass" id="main_form" style="display: none;">
+            <div class="maincontainer">
+              <div class="container">
+                <h1 id="aadhar_id" style="color: "></h1>
+                <h1 id="name_id" style="color: blue;margin-bottom: 10px;"></h1>
+                <table id="table_medicines" style="width: 100%;border: 3px solid orange;"border="3px solid " >
+                      <tr><th width="8%" style="color: #050aa8;text-align: center;font-size: 23px;">S.No</th> <th width="70%" style="color: #050aa8;text-align: center;font-size: 23px;">Medicine Name</th> <th style="color: #050aa8;text-align: center;font-size: 23px;" width="10%">No of Days</th></tr>
+                </table>
+                <button id="submit_id">Submit</button>
+                
+              </div>
+              
+              
+            </div>
+            
+          </div>
+        </div>
+         
+
+      <script>
+        function moreFun(x){
+          if(x.target.value=='Add medicine'){
+            window.location.replace('add_medicine_medical.html')
+          }
+          else if(x.target.value=='Add patient'){
+            window.location.replace('add_patient_to_hospital.html')
+          }
+          else if(x.target.value=='Add lab tests'){
+            window.location.replace('add_lab_tests_hospital.html')
+          }
+        }
+
+
+         const menuBtn = document.querySelector(".menu-icon span");
+         const searchBtn = document.querySelector(".search-icon");
+         const cancelBtn = document.querySelector(".cancel-icon");
+         const items = document.querySelector(".nav-items");
+         const form = document.querySelector("form");
+         menuBtn.onclick = ()=>{
+           items.classList.add("active");
+           menuBtn.classList.add("hide");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+         cancelBtn.onclick = ()=>{
+           items.classList.remove("active");
+           menuBtn.classList.remove("hide");
+           searchBtn.classList.remove("hide");
+           cancelBtn.classList.remove("show");
+           form.classList.remove("active");
+           cancelBtn.style.color = "#ff3d00";
+         }
+         searchBtn.onclick = ()=>{
+           form.classList.add("active");
+           searchBtn.classList.add("hide");
+           cancelBtn.classList.add("show");
+         }
+
+      </script>
+
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
+    <script type="module">
+
+              import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+              import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-analytics.js";
+              import { getDatabase,ref,set,child,update,remove } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+              
+              const firebaseConfig = {
+                apiKey: "AIzaSyA4Ch7t3M2xz0ulzhptz4JXuOSVmXhBMLk",
+                authDomain: "patient-info-monitoring.firebaseapp.com",
+                databaseURL: "https://patient-info-monitoring-default-rtdb.firebaseio.com",
+                projectId: "patient-info-monitoring",
+                storageBucket: "patient-info-monitoring.appspot.com",
+                messagingSenderId: "214293049056",
+                appId: "1:214293049056:web:5ca372effeff5c5a372a85",
+                measurementId: "G-TCBBEFV54M"
+              };
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+
+              // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db=getDatabase();
+      var hospital_s="",aadhar_s="";
+      var user_name_s="";
+
+      var error_msg_fet=document.getElementById("error_fetcher");
+      var loading_bar_fet=document.getElementById("loading_bar_fetcher");
+      var loader_fet=document.getElementById("loader_fetcher");
+
+      window.onload = function() {
+          hospital_s=window.localStorage.getItem("hospital_name");
+          aadhar_s=window.localStorage.getItem("patient_aadhar");
+          user_name_s=window.localStorage.getItem("patient_name_lab");
+          if(navigator.onLine){
+
+            document.getElementById("aadhar_id").innerHTML=aadhar_s;
+            document.getElementById("name_id").innerHTML=user_name_s;
+
+            loading_bar_fet.innerHTML="Please wait while we fetching "+(aadhar_s)+"  medical details...";
+            const dbref=firebase.database().ref();
+            dbref.child("Hospitals").child(hospital_s).child("Medical").child(aadhar_s).once("value",function(snapshot){
+
+                var k=0;
+                    
+                    dbref.child("Hospitals").child(hospital_s).child("Medical").child(aadhar_s).once("value",function(snapshotm){
+                        snapshotm.forEach(function(childsnapshot){
+                            var val=childsnapshot.key;
+                            var no_of_days_s=childsnapshot.val().No_of_Days;
+                            
+                            var test=document.createElement("h2");
+                            val=val.replace("{}",".");
+                            val=val.replace("[]","#");
+                            val=val.replace("<>","$");
+                                                      
+                            var row=document.getElementById('table_medicines').rows.length;
+                            var x=document.getElementById('table_medicines').insertRow(row);
+                            var c1=x.insertCell(0);
+                            var c2=x.insertCell(1);
+                            var c3=x.insertCell(2);
+                            c1.innerHTML=row;
+                            c1.style.fontSize='30px';
+                            c1.style.textAlign='center';
+                            c1.style.fontFamily='serif';
+                            c2.innerHTML=val;
+                            c2.style.fontSize='25px';
+                            c2.style.fontFamily='serif';
+                            c3.innerHTML=no_of_days_s;
+                            c3.style.fontSize='30px';
+                            c3.style.textAlign='center';
+                            c3.style.fontFamily='serif';                         
+                      });
+                      
+                      document.getElementById('fetching_form').style.display='none';
+                      document.getElementById('main_form').style.display='block';
+                    }).catch((error)=>{
+                        error_msg_fet.textContent=error;
+                        loading_bar_fet.textContent="";
+                        loader_fet.style.display='none';
+                        document.getElementById('fetching_form').style.display='block';
+                        document.getElementById('main_form').style.display='none';
+                    });
+                                               
+              }).catch((error)=>{
+                  error_msg_fet.textContent=error;
+                  loading_bar_fet.textContent="";
+                  loader_fet.style.display='none';
+                  document.getElementById('fetching_form').style.display='block';
+                  document.getElementById('main_form').style.display='none';
+              });
+    
+          }else{
+            alert("Oops! You're offline. Please check your network connection.Then refresh this page.")
+          }
+          
+      };
+
+      function SubmitMedicine(){
+        var ref = firebase.database().ref("Hospitals/"+hospital_s+"/Medical/"+aadhar_s);
+        ref.remove();
+        Visited_date_update();
+        alert("Medicine Submitted successfully.");
+        window.location.replace('medical_hospital.html')
+
+      }
+      document.getElementById("submit_id").addEventListener('click',SubmitMedicine);
+
+      function Visited_date_update(){
+        var date=new Date();
+        var today=date.getDate()+":"+(date.getMonth()+1)+":"+date.getFullYear();
+        var dbRef=firebase.database().ref("Hospitals/"+hospital_s+"/Patients/"+aadhar_s);
+        dbRef.update({
+               Last_Visited:today
+        },(error)=>{
+            if(error){
+                document.getElementById("error_reading_unit_span").innerHTML=error;
+                document.getElementById("upload_reading_fetcher").style.display='none';
+                document.getElementById("wait_upload_reading").style.display='none';
+            }else{
+                var Refe=firebase.database().ref("Users/"+aadhar_s+"/Hospitals/"+hospital_s);
+                Refe.update({
+                      Last_Visited:today
+            },(error)=>{
+                if(error){
+                    document.getElementById("error_reading_unit_span").innerHTML=error;
+                    document.getElementById("upload_reading_fetcher").style.display='none';
+                    document.getElementById("wait_upload_reading").style.display='none';
+                }
+            }).catch(function(error_fetcher){
+                document.getElementById("error_reading_unit_span").innerHTML=error;
+                document.getElementById("upload_reading_fetcher").style.display='none';
+                document.getElementById("wait_upload_reading").style.display='none';
+            });
+           }
+          }).catch(function(error_fetcher){
+              document.getElementById("error_reading_unit_span").innerHTML=error;
+              document.getElementById("upload_reading_fetcher").style.display='none';
+              document.getElementById("wait_upload_reading").style.display='none';
+        });
+      }
+
+
+      function RefreshBtn(){
+        window.location.reload(true);
+      }
+      document.getElementById("refreshbtn").addEventListener('click',RefreshBtn);
+        
+    </script>
+   </body>
+</html>
